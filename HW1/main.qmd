@@ -1,0 +1,57 @@
+---
+title: "STATS 506 - Homework 1"
+author: "Vincent Weng"
+format: html
+---
+
+Problem 1 - Wine Data
+Part (A)
+```{r}
+wine_data <- mydata <- read.table("wine.data", sep = ",")
+colnames(wine_data) <- c("Class", "Alcohol", "Malic_Acid", "Ash", "Alcalinity_of_Ash", 
+                         "Magnesium", "Total_Phenols", "Flavanoids", "Nonflavanoid_Phenols",
+                         "Proanthocyanins", "Color_Intensity", "Hue", 
+                         "OD280/OD315_of_Diluted_Wines", "Proline")
+```
+
+Part (B)
+```{r}
+class1_count <- sum(wine_data$Class == 1)
+class2_count <- sum(wine_data$Class == 2)
+class3_count <- sum(wine_data$Class == 3)
+
+cat("Class 1 count:", class1_count, "\n",
+    "Class 2 count:", class2_count, "\n",
+    "Class 3 count:", class3_count, "\n")
+```
+
+Part (C)
+```{r}
+# Question 1
+corr <- cor(wine_data$Alcohol, wine_data$Color_Intensity)
+cat("Total correlation:", corr, "\n")
+
+# Question 2
+# Finding correlation between alcohol content and color intensity for class 1
+class1_data <- wine_data[wine_data$Class == 1, ]
+class1_corr <- cor(class1_data$Alcohol, class1_data$Color_Intensity)
+cat("Class 1 correlation:", class1_corr, "\n")
+
+# Finding correlation between alcohol content and color intensity for class 2
+class2_data <- wine_data[wine_data$Class == 2, ]
+class2_corr <- cor(class2_data$Alcohol, class2_data$Color_Intensity)
+cat("Class 2 correlation:", class2_corr, "\n")
+
+# Finding correlation between alcohol content and color intensity for class 3
+class3_data <- wine_data[wine_data$Class == 3, ]
+class3_corr <- cor(class3_data$Alcohol, class3_data$Color_Intensity)
+cat("Class 3 correlation:", class3_corr, "\n")
+
+# Question 3
+max_alc = max(wine_data$Alcohol)
+cat("Highest alcohol content:", max_alc, "\n")
+```
+
+
+
+
