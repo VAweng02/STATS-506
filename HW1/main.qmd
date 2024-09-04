@@ -48,10 +48,60 @@ class3_corr <- cor(class3_data$Alcohol, class3_data$Color_Intensity)
 cat("Class 3 correlation:", class3_corr, "\n")
 
 # Question 3
-max_alc = max(wine_data$Alcohol)
-cat("Highest alcohol content:", max_alc, "\n")
+max_color_intensity = max(wine_data$Color_Intensity)
+max_color_intensity_filtered <- wine_data[wine_data$Color_Intensity == max_color_intensity, ]
+cat("Highest color intensity:", max_color_intensity, "\n")
+cat("Alcohol content of highest color intensity:", max_color_intensity_filtered$Alcohol, "\n")
+
+# Question 4
+proanth_greater_than_ash <- sum(wine_data$Proanthocyanins > wine_data$Ash)
+percent_proanth_greater_than_ash <- (proanth_greater_than_ash / nrow(wine_data)) * 100
+cat("Percentage of wines with higher content of proanthocyanins than ash:", percent_proanth_greater_than_ash, "\n")
+```
+
+Part (D)
+```{r}
+# TODO
 ```
 
 
+Problem 3 - Palindromic Numbers
+Part(A)
+```{r}
+isPalindromic <- function(int) {
+  output_list <- list()
+  str <- as.character(int)
+  
+  start <- 1
+  end <- nchar(str)
+  
+  is_palindromic <- TRUE
+  while (start < end) {
+    if (substr(str, start, start) != substr(str, end, end)) {
+      is_palindromic <- FALSE
+      break
+    }
+    start <- start + 1
+    end <- end - 1
+  }
+  output_list <- append(output_list, is_palindromic)
+  
+  reversed <- ""
+  for (i in nchar(str):1) {
+    reversed <- paste0(reversed, substr(str, i, i))
+  }
+  reversed <- as.numeric(reversed)
+  output_list <- append(output_list, reversed)
+}
 
+result <- isPalindromic(729927)
+result
 
+result <- isPalindromic(39951)
+result
+```
+
+Part(B)
+```{r}
+
+```
