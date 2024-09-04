@@ -69,6 +69,10 @@ Problem 3 - Palindromic Numbers
 Part(A)
 ```{r}
 isPalindromic <- function(int) {
+  if (!is.numeric(int) || floor(int) != int || int <= 0) {
+    stop("Input must be a positive integer.")
+  }
+  
   output_list <- list()
   str <- as.character(int)
   
@@ -103,5 +107,33 @@ result
 
 Part(B)
 ```{r}
+nextPalindrome <- function(int) {
+  if (!is.numeric(int) || floor(int) != int || int <= 0) {
+    stop("Input must be a positive integer.")
+  }
+  
+  next_int <- int + 1
+  while (!isPalindromic(next_int)[[1]]) {
+    next_int <- next_int + 1
+  }
+  
+  return(c(next_int))
+}
 
+nextPalindrome(7152)
+nextPalindrome(765431537)
 ```
+
+Part(C)
+```{r}
+nextPalindrome(391)
+nextPalindrome(9928)
+nextPalindrome(19272719)
+nextPalindrome(109)
+nextPalindrome(2)
+```
+
+
+
+
+
