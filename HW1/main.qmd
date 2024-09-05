@@ -7,7 +7,7 @@ format: html
 Problem 1 - Wine Data
 Part (A)
 ```{r}
-wine_data <- mydata <- read.table("wine.data", sep = ",")
+wine_data <- read.table("wine.data", sep = ",")
 colnames(wine_data) <- c("Class", "Alcohol", "Malic_Acid", "Ash", "Alcalinity_of_Ash", 
                          "Magnesium", "Total_Phenols", "Flavanoids", "Nonflavanoid_Phenols",
                          "Proanthocyanins", "Color_Intensity", "Hue", 
@@ -63,6 +63,59 @@ Part (D)
 ```{r}
 # TODO
 ```
+
+
+
+
+
+
+
+Problem 2 - AskAManager.org Data
+Part (A)
+```{r}
+askamanager_data <- read.csv("AskAManager.csv", sep = ",")
+```
+
+Part (B)
+```{r}
+colnames(askamanager_data) <- c("X",
+                                "Timestamp",
+                                "Age",
+                                "Industry",
+                                "Job_Title",
+                                "Job_Context",
+                                "Annual_Salary",
+                                "Additional_Compensation",
+                                "Currency",
+                                "Other_Currency",
+                                "Income_Context",
+                                "Country",
+                                "US_State",
+                                "City",
+                                "Total_Experience_Years",
+                                "Field_Experience_Years",
+                                "Highest_Education",
+                                "Gender",
+                                "Race"
+                              )
+```
+
+Part (C)
+```{r}
+num_rows_before <- nrow(askamanager_data)
+askamanager_data <- askamanager_data[askamanager_data$Currency == 'USD',]
+num_rows_after <- nrow(askamanager_data)
+
+cat("Number of rows before filtering:", num_rows_before, "\nNumber of rows after filtering:", num_rows_after)
+```
+
+Part (D)
+```{r}
+TODO
+```
+
+
+
 
 
 Problem 3 - Palindromic Numbers
