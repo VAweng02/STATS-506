@@ -61,10 +61,36 @@ cat("Percentage of wines with higher content of proanthocyanins than ash:", perc
 
 Part (D)
 ```{r}
-# TODO
+overall_avg_row <- colMeans(wine_data)
+avg_df <- as.data.frame(t(overall_avg_row))
+rownames(avg_df) <- "Overall"
+
+for (i in 1:3) {
+  class_data <- wine_data[wine_data$Class == i, ]
+  class_avg_row <- colMeans(class_data)
+  class_avg_df <- as.data.frame(t(class_avg_row))
+  rownames(class_avg_df) <- paste("Class", i)
+  avg_df <- rbind(avg_df, class_avg_df)
+}
+
+avg_df
 ```
 
 
+Part (E)
+```{r}
+class_1 <- wine_data$Total_Phenols[wine_data$Class == 1]
+class_2 <- wine_data$Total_Phenols[wine_data$Class == 2]
+class_3 <- wine_data$Total_Phenols[wine_data$Class == 3]
+
+t_test_1_2 <- t.test(class_1, class_2)
+t_test_1_3 <- t.test(class_1, class_3)
+t_test_2_3 <- t.test(class_2, class_3)
+
+print(t_test_1_2)
+print(t_test_1_3)
+print(t_test_2_3)
+```
 
 
 
@@ -80,7 +106,7 @@ Part (B)
 ```{r}
 colnames(askamanager_data) <- c("X",
                                 "Timestamp",
-                                "Age",
+                                "Age_Range",
                                 "Industry",
                                 "Job_Title",
                                 "Job_Context",
@@ -111,9 +137,32 @@ cat("Number of rows before filtering:", num_rows_before, "\nNumber of rows after
 
 Part (D)
 ```{r}
-TODO
+split_age <- strsplit(as.character(askamanager_data[["Age_Range"]]), "-")
+askamanager_data$Age_Min <- as.numeric(sapply(split_age, `[`, 1))
+
+askamanager_data
+
+num_rows_before <- nrow(askamanager_data)
+askamanager_data_filtered <- askamanager_data[askamanager_data$Age_min >= 18 &
+                                              askamanager_data$Total_Experience_Years <= (askamanager_data$Age_min - 18) &
+                                              askamanager_data$Field_Experience_Years <= askamanager_data$Total_Experience_Years, ]
+num_rows_after <- nrow(askamanager_data_filtered)
+cat("Number of rows before filtering:", num_rows_before, "\nNumber of rows after filtering:", num_rows_after)
+
 ```
 
+Part (E)
+```{r}
+summary(askamanager_data$Annual_Salary)
+
+lower_threshold <- 10000
+upper_threshold <- 1000000
+
+askamanager_data_filtered <- askamanager_data[askamanager_data$Annual_Salary >= lower_threshold & askamanager_data$Annual_Salary <= upper_threshold, ]
+
+final_sample_size <- nrow(askamanager_data_filtered)
+cat("Final sample size after filtering:", final_sample_size, "\n")
+```
 
 
 
@@ -185,8 +234,3 @@ nextPalindrome(19272719)
 nextPalindrome(109)
 nextPalindrome(2)
 ```
-
-
-
-
-
