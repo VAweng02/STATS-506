@@ -140,8 +140,6 @@ Part (D)
 split_age <- strsplit(as.character(askamanager_data[["Age_Range"]]), "-")
 askamanager_data$Age_Min <- as.numeric(sapply(split_age, `[`, 1))
 
-askamanager_data
-
 num_rows_before <- nrow(askamanager_data)
 askamanager_data_filtered <- askamanager_data[askamanager_data$Age_min >= 18 &
                                               askamanager_data$Total_Experience_Years <= (askamanager_data$Age_min - 18) &
