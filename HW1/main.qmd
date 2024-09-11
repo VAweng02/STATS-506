@@ -168,6 +168,12 @@ cat("Final sample size after filtering:", final_sample_size, "\n")
 Problem 3 - Palindromic Numbers
 Part(A)
 ```{r}
+# Description:
+#   Checks if a given positive integer is a palindrome
+# Arguments:
+#   int - a positive integer
+# Returns:
+#   List containing 2 elements: isPalindromic (boolean indicating if the input is palindromic), reversed (Input with its digits reversed)
 isPalindromic <- function(int) {
   if (!is.numeric(int) || floor(int) != int || int <= 0) {
     stop("Input must be a positive integer.")
@@ -207,6 +213,12 @@ result
 
 Part(B)
 ```{r}
+# Description:
+#   Finds the next palindrome number strictly greater than the input
+# Arguments:
+#   int - a positive integer
+# Returns:
+#   a vector of length 1 with the next palindrome number greater than the input
 nextPalindrome <- function(int) {
   if (!is.numeric(int) || floor(int) != int || int <= 0) {
     stop("Input must be a positive integer.")
