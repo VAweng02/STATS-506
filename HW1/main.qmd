@@ -4,6 +4,8 @@ author: "Vincent Weng"
 format: html
 ---
 
+GitHub Repository Link: https://github.com/VAweng02/STATS-506
+
 Problem 1 - Wine Data
 Part (A)
 ```{r}
