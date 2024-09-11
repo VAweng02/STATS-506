@@ -6,34 +6,44 @@ format: html
 
 GitHub Repository Link: https://github.com/VAweng02/STATS-506
 
-Problem 1 - Wine Data
-Part (A)
+<h3>Problem 1 - Wine Data</h3>
+Part (A) - Import the data into a data.frame in R. Use the information in the “wine.names” file to give appropriate column names. (Note: Downloading and unzipping the file can take place outside of your submitted document, but importing the file should be in the submission.)
 ```{r}
+# "wine.data" is read into a R data frame called "wine_data"
 wine_data <- read.table("wine.data", sep = ",")
+
+# Appropriate column names are assigned 
 colnames(wine_data) <- c("Class", "Alcohol", "Malic_Acid", "Ash", "Alcalinity_of_Ash", 
                          "Magnesium", "Total_Phenols", "Flavanoids", "Nonflavanoid_Phenols",
                          "Proanthocyanins", "Color_Intensity", "Hue", 
                          "OD280/OD315_of_Diluted_Wines", "Proline")
 ```
 
-Part (B)
+Part (B) - The data contains information on three different classes of wine. Check and report that the number of wines within each class is correct as reported in “wine.names”.
 ```{r}
+# Counting number of rows in 'wine_data' for each class
 class1_count <- sum(wine_data$Class == 1)
 class2_count <- sum(wine_data$Class == 2)
 class3_count <- sum(wine_data$Class == 3)
 
+# Printing out out the results
 cat("Class 1 count:", class1_count, "\n",
     "Class 2 count:", class2_count, "\n",
     "Class 3 count:", class3_count, "\n")
 ```
+The number of wines within each class is correct and double checked as reported in "wine.names".
 
-Part (C)
+Part (C) - Use the data to answer the following questions:
+1. What is the correlation between alcohol content and color intensity?
+2. Which class has the highest correlation? Which has the lowest?
+3. What is the alcohol content of the wine with the highest color intensity?
+4. What percentage of wines had a higher content of proanthocyanins compare to ash?
+
 ```{r}
-# Question 1
+# Finding correlation between alcohol content and color intensity
 corr <- cor(wine_data$Alcohol, wine_data$Color_Intensity)
 cat("Total correlation:", corr, "\n")
 
-# Question 2
 # Finding correlation between alcohol content and color intensity for class 1
 class1_data <- wine_data[wine_data$Class == 1, ]
 class1_corr <- cor(class1_data$Alcohol, class1_data$Color_Intensity)
@@ -49,24 +59,32 @@ class3_data <- wine_data[wine_data$Class == 3, ]
 class3_corr <- cor(class3_data$Alcohol, class3_data$Color_Intensity)
 cat("Class 3 correlation:", class3_corr, "\n")
 
-# Question 3
+# Finding highest color intensity 
 max_color_intensity = max(wine_data$Color_Intensity)
+
+# Filtering the row with the highest color intensity
 max_color_intensity_filtered <- wine_data[wine_data$Color_Intensity == max_color_intensity, ]
 cat("Highest color intensity:", max_color_intensity, "\n")
 cat("Alcohol content of highest color intensity:", max_color_intensity_filtered$Alcohol, "\n")
 
-# Question 4
+# Finding number of rows where proanthocyanins > ash and dividing that by total number of rows to get a percentage
 proanth_greater_than_ash <- sum(wine_data$Proanthocyanins > wine_data$Ash)
 percent_proanth_greater_than_ash <- (proanth_greater_than_ash / nrow(wine_data)) * 100
 cat("Percentage of wines with higher content of proanthocyanins than ash:", percent_proanth_greater_than_ash, "\n")
 ```
+1. The correlation between alcohol content and color intensity is 0.5463642.
+2. Class 1 has the highest correlation and class 2 has the lowest correlation.
+3. The alcohol content of the wine with the highest color intensity is 14.34.
+4. The percentage of wines had a higher content of proanthocyanins compare to ash is 8.426966.
 
-Part (D)
+Part (D) - Create a table identifying the average value of each variable, providing one row for the overall average, and one row per class with class averages. (This table does not need to be “fancy” but should clearly identify what each value represents.)
 ```{r}
+# Creating a row for overall average value of each variable
 overall_avg_row <- colMeans(wine_data)
 avg_df <- as.data.frame(t(overall_avg_row))
 rownames(avg_df) <- "Overall"
 
+# Creating a row overall average value of each variable per class
 for (i in 1:3) {
   class_data <- wine_data[wine_data$Class == i, ]
   class_avg_row <- colMeans(class_data)
@@ -79,7 +97,7 @@ avg_df
 ```
 
 
-Part (E)
+Part (E) - Carry out a series of t-tests to examine whether the level of phenols differs across the three classes. Present the R output and interpret the results.
 ```{r}
 class_1 <- wine_data$Total_Phenols[wine_data$Class == 1]
 class_2 <- wine_data$Total_Phenols[wine_data$Class == 2]
@@ -93,19 +111,19 @@ print(t_test_1_2)
 print(t_test_1_3)
 print(t_test_2_3)
 ```
+All three t-tests show statistically significant differences in phenol levels between the wine classes.The largest difference is observed between Class 1 and Class 3, while Class 1 and Class 2 and Class 2 and Class 3 have smaller, but still significant differences. Overall, these results suggest that the phenol levels are significantly different across all three wine classes.
 
 
-
-
-
-Problem 2 - AskAManager.org Data
-Part (A)
+<h3>Problem 2 - AskAManager.org Data<h3>
+Part (A) - Import the data into a data.frame in R. As with the wine data, you may download the data outside of your submission, but importation should take place inside the problem set submission.
 ```{r}
+# "AskAManager.csv" is read into a R data frame called "askamanager_data"
 askamanager_data <- read.csv("AskAManager.csv", sep = ",")
 ```
 
-Part (B)
+Part (B) - Clean up the variable names. Simplify them.
 ```{r}
+# Column names are simplified and renamed 
 colnames(askamanager_data) <- c("X",
                                 "Timestamp",
                                 "Age_Range",
@@ -128,13 +146,13 @@ colnames(askamanager_data) <- c("X",
                               )
 ```
 
-Part (C)
+Part (C) - Restrict the data to those being paid in US dollars (USD). Show that it worked by confirming the number of observations before and after restricting the data.
 ```{r}
 num_rows_before <- nrow(askamanager_data)
 askamanager_data <- askamanager_data[askamanager_data$Currency == 'USD',]
 num_rows_after <- nrow(askamanager_data)
 
-cat("Number of rows before filtering:", num_rows_before, "\nNumber of rows after filtering:", num_rows_after)
+cat("Number of rows before restriction:", num_rows_before, "\nNumber of rows after restriction:", num_rows_after)
 ```
 
 Part (D)
