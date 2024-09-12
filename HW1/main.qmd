@@ -111,10 +111,10 @@ print(t_test_1_2)
 print(t_test_1_3)
 print(t_test_2_3)
 ```
-All three t-tests show statistically significant differences in phenol levels between the wine classes.The largest difference is observed between Class 1 and Class 3, while Class 1 and Class 2 and Class 2 and Class 3 have smaller, but still significant differences. Overall, these results suggest that the phenol levels are significantly different across all three wine classes.
+All three t-tests show statistically significant differences in phenol levels between the classes.The largest difference is observed between Class 1 and Class 3, while (Class 1 and Class 2) and (Class 2 and Class 3) have smaller, but still significant differences. Overall, these results show that the phenol levels are significantly different across the three wine classes.
 
 
-<h3>Problem 2 - AskAManager.org Data<h3>
+<h3>Problem 2 - AskAManager.org Data</h3>
 Part (A) - Import the data into a data.frame in R. As with the wine data, you may download the data outside of your submission, but importation should take place inside the problem set submission.
 ```{r}
 # "AskAManager.csv" is read into a R data frame called "askamanager_data"
@@ -149,44 +149,81 @@ colnames(askamanager_data) <- c("X",
 Part (C) - Restrict the data to those being paid in US dollars (USD). Show that it worked by confirming the number of observations before and after restricting the data.
 ```{r}
 num_rows_before <- nrow(askamanager_data)
-askamanager_data <- askamanager_data[askamanager_data$Currency == 'USD',]
-num_rows_after <- nrow(askamanager_data)
+# Filtering rows where "Currency" is in US dollars (USD)
+askamanager_data_filtered <- askamanager_data[askamanager_data$Currency == 'USD',]
+num_rows_after <- nrow(askamanager_data_filtered)
 
 cat("Number of rows before restriction:", num_rows_before, "\nNumber of rows after restriction:", num_rows_after)
 ```
 
-Part (D)
+Part (D) - Assume no one starts working before age 18. Eliminate any rows for which their age, years of experience in their field, and years of experience total are impossible. Again, confirm the number of observations.
 ```{r}
+# Removing the "years" substring from "Total_Experience_Years" and "Field_Experience_Years"
+askamanager_data$Total_Experience_Years <- gsub("[^0-9-]", "", askamanager_data$Total_Experience_Years)
+askamanager_data$Field_Experience_Years <- gsub("[^0-9-]", "", askamanager_data$Field_Experience_Years)
+
+# Splitting the ranges at "-" to extract the max of the range
 split_age <- strsplit(as.character(askamanager_data[["Age_Range"]]), "-")
-askamanager_data$Age_Min <- as.numeric(sapply(split_age, `[`, 1))
+split_total_exp <- strsplit(as.character(askamanager_data[["Total_Experience_Years"]]), "-")
+split_field_exp <- strsplit(as.character(askamanager_data[["Field_Experience_Years"]]), "-")
+
+# Converting the number after the "-" into numeric, so it can be used as a filtering condition
+askamanager_data$Age_Max <- as.numeric(sapply(split_age, `[`, 2))
+askamanager_data$Total_Exp_Max <- as.numeric(sapply(split_total_exp, `[`, 2))
+askamanager_data$Field_Exp_Max <- as.numeric(sapply(split_field_exp, `[`, 2))
+
 
 num_rows_before <- nrow(askamanager_data)
-askamanager_data_filtered <- askamanager_data[askamanager_data$Age_min >= 18 &
-                                              askamanager_data$Total_Experience_Years <= (askamanager_data$Age_min - 18) &
-                                              askamanager_data$Field_Experience_Years <= askamanager_data$Total_Experience_Years, ]
-num_rows_after <- nrow(askamanager_data_filtered)
+
+# Filtering rows where the age is greater than or equal to 18 (sinceno one starts working before age 18)
+askamanager_data_filtered <- subset(askamanager_data, Age_Max >= 18)
+
+# Filtering rows where the field experience years cannot exceed the total experience years
+askamanager_data_filtered <- subset(askamanager_data, Total_Experience_Years >= Field_Experience_Years)
+
+# Filtering rows where the number of years after 18 cannot exceed the total experience years
+askamanager_data_filtered <- subset(askamanager_data, Age_Max - 18 >= Total_Experience_Years)
+
+num_rows_after <- nrow(askamanager_data_filtered)                 
+                                                
 cat("Number of rows before filtering:", num_rows_before, "\nNumber of rows after filtering:", num_rows_after)
 
 ```
 
-Part (E)
+Part (E) - A lot of the incomes are likely false. Eliminate any rows with extremely low or extremely high salaries. I’ll leave the decision of what thresholds to use up to you; you could choose to eliminate only impossible values, or you could restrict the sample to eliminate the extreme values even if they are realistic (e.g. removing the billionaires or the folks making < $1,000 per year). You must justify your choice, along with either a cited source or an exploration the data, or some combination.
 ```{r}
 summary(askamanager_data$Annual_Salary)
+# Finding Annual Salary mean
+salary_mean <- mean(askamanager_data$Annual_Salary, na.rm = TRUE)
+# Finding Annual Salary standard deviation
+salary_sd <- sd(askamanager_data$Annual_Salary, na.rm = TRUE)
 
-lower_threshold <- 10000
-upper_threshold <- 1000000
+# Initializing upper and lower bounds
+lower_thres <- salary_mean - 2 * salary_sd
+upper_thres <- salary_mean + 2 * salary_sd
 
-askamanager_data_filtered <- askamanager_data[askamanager_data$Annual_Salary >= lower_threshold & askamanager_data$Annual_Salary <= upper_threshold, ]
+# Filtering based on those thresholds and greater than $1000
+askamanager_data_filtered <- askamanager_data[
+  askamanager_data$Annual_Salary >= lower_thres & 
+  askamanager_data$Annual_Salary <= upper_thres & 
+  askamanager_data$Annual_Salary > 1000, 
+]
+
+summary(askamanager_data_filtered$Annual_Salary)
 
 final_sample_size <- nrow(askamanager_data_filtered)
 cat("Final sample size after filtering:", final_sample_size, "\n")
 ```
+The final sample size is 27944. The method that I used is using standard deviation to create my thresholds. I used a standard deviation of 2 so that filtering based on 2 standard deviations above and below will yield about 95% of the annual salaries. Furthermore, I filtered out annual salaries of $1000 or below, which I think is a reasonable lower bound to eliminate the extremely low salaries (of which also eliminates annual salaries that are equal to 0). The summary box before the filtering showed that the max was nearly 6 billion dollars, which is far too extreme. After the filtering, the max is now 43.8 million dollars, which is still really high, but not completely out of the blue if its a rare high earner.
 
 
+<h3>Problem 3 - Palindromic Numbers</h3>
+Part(A) - Write function isPalindromic that checks if a given positive integer is a palindrome. Be sure to provide a reasonable error on an invalid input. Be sure to document your function (see instructions above).
 
-
-Problem 3 - Palindromic Numbers
-Part(A)
+Input: A positive integer
+Output: A list with two elements:
+isPalindromic: A logical value indicating if the input is palindromic.
+reversed: The input with its digits reversed.
 ```{r}
 # Description:
 #   Checks if a given positive integer is a palindrome
@@ -231,7 +268,10 @@ result <- isPalindromic(39951)
 result
 ```
 
-Part(B)
+Part(B) - Create a function nextPalindrome that finds the next palindromic number strictly greater than the input. Be sure to provide a reasonable error on an invalid input.
+
+Input: A positive integer
+Output: A vector of length 1 with the next palindromic number greater than the input
 ```{r}
 # Description:
 #   Finds the next palindrome number strictly greater than the input
@@ -256,7 +296,7 @@ nextPalindrome(7152)
 nextPalindrome(765431537)
 ```
 
-Part(C)
+Part(C) - Use these functions to find the next palindrome for each of the following:
 ```{r}
 nextPalindrome(391)
 nextPalindrome(9928)

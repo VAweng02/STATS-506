@@ -280,83 +280,128 @@ mean of x mean of y
  2.258873  1.678750 </code></pre>
 </div>
 </div>
-<p>All three t-tests show statistically significant differences in phenol levels between the wine classes.The largest difference is observed between Class 1 and Class 3, while Class 1 and Class 2 and Class 2 and Class 3 have smaller, but still significant differences. Overall, these results suggest that the phenol levels are significantly different across all three wine classes.</p>
-<p>Problem 2 - AskAManager.org Data Part (A)</p>
+<p>All three t-tests show statistically significant differences in phenol levels between the classes.The largest difference is observed between Class 1 and Class 3, while (Class 1 and Class 2) and (Class 2 and Class 3) have smaller, but still significant differences. Overall, these results show that the phenol levels are significantly different across the three wine classes.</p>
+<h3 class="anchored">
+Problem 2 - AskAManager.org Data
+</h3>
+<p>Part (A) - Import the data into a data.frame in R. As with the wine data, you may download the data outside of your submission, but importation should take place inside the problem set submission.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>askamanager_data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"AskAManager.csv"</span>, <span class="at">sep =</span> <span class="st">","</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># "AskAManager.csv" is read into a R data frame called "askamanager_data"</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>askamanager_data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"AskAManager.csv"</span>, <span class="at">sep =</span> <span class="st">","</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Part (B)</p>
+<p>Part (B) - Clean up the variable names. Simplify them.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(askamanager_data) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"X"</span>,</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Timestamp"</span>,</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Age_Range"</span>,</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Industry"</span>,</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Job_Title"</span>,</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Job_Context"</span>,</span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Annual_Salary"</span>,</span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Additional_Compensation"</span>,</span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Currency"</span>,</span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Other_Currency"</span>,</span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Income_Context"</span>,</span>
-<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Country"</span>,</span>
-<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"US_State"</span>,</span>
-<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"City"</span>,</span>
-<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Total_Experience_Years"</span>,</span>
-<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Field_Experience_Years"</span>,</span>
-<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Highest_Education"</span>,</span>
-<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Gender"</span>,</span>
-<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Race"</span></span>
-<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>                              )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Column names are simplified and renamed </span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(askamanager_data) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"X"</span>,</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Timestamp"</span>,</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Age_Range"</span>,</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Industry"</span>,</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Job_Title"</span>,</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Job_Context"</span>,</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Annual_Salary"</span>,</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Additional_Compensation"</span>,</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Currency"</span>,</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Other_Currency"</span>,</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Income_Context"</span>,</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Country"</span>,</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"US_State"</span>,</span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"City"</span>,</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Total_Experience_Years"</span>,</span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Field_Experience_Years"</span>,</span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Highest_Education"</span>,</span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Gender"</span>,</span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Race"</span></span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>                              )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Part (C)</p>
+<p>Part (C) - Restrict the data to those being paid in US dollars (USD). Show that it worked by confirming the number of observations before and after restricting the data.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>num_rows_before <span class="ot">&lt;-</span> <span class="fu">nrow</span>(askamanager_data)</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>askamanager_data <span class="ot">&lt;-</span> askamanager_data[askamanager_data<span class="sc">$</span>Currency <span class="sc">==</span> <span class="st">'USD'</span>,]</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>num_rows_after <span class="ot">&lt;-</span> <span class="fu">nrow</span>(askamanager_data)</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Number of rows before filtering:"</span>, num_rows_before, <span class="st">"</span><span class="sc">\n</span><span class="st">Number of rows after filtering:"</span>, num_rows_after)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Filtering rows where "Currency" is in US dollars (USD)</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>askamanager_data_filtered <span class="ot">&lt;-</span> askamanager_data[askamanager_data<span class="sc">$</span>Currency <span class="sc">==</span> <span class="st">'USD'</span>,]</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>num_rows_after <span class="ot">&lt;-</span> <span class="fu">nrow</span>(askamanager_data_filtered)</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Number of rows before restriction:"</span>, num_rows_before, <span class="st">"</span><span class="sc">\n</span><span class="st">Number of rows after restriction:"</span>, num_rows_after)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Number of rows before restriction: 28062 
+Number of rows after restriction: 23374</code></pre>
+</div>
+</div>
+<p>Part (D) - Assume no one starts working before age 18. Eliminate any rows for which their age, years of experience in their field, and years of experience total are impossible. Again, confirm the number of observations.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Removing the "years" substring from "Total_Experience_Years" and "Field_Experience_Years"</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>askamanager_data<span class="sc">$</span>Total_Experience_Years <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"[^0-9-]"</span>, <span class="st">""</span>, askamanager_data<span class="sc">$</span>Total_Experience_Years)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>askamanager_data<span class="sc">$</span>Field_Experience_Years <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"[^0-9-]"</span>, <span class="st">""</span>, askamanager_data<span class="sc">$</span>Field_Experience_Years)</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Splitting the ranges at "-" to extract the max of the range</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>split_age <span class="ot">&lt;-</span> <span class="fu">strsplit</span>(<span class="fu">as.character</span>(askamanager_data[[<span class="st">"Age_Range"</span>]]), <span class="st">"-"</span>)</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>split_total_exp <span class="ot">&lt;-</span> <span class="fu">strsplit</span>(<span class="fu">as.character</span>(askamanager_data[[<span class="st">"Total_Experience_Years"</span>]]), <span class="st">"-"</span>)</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>split_field_exp <span class="ot">&lt;-</span> <span class="fu">strsplit</span>(<span class="fu">as.character</span>(askamanager_data[[<span class="st">"Field_Experience_Years"</span>]]), <span class="st">"-"</span>)</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Converting the number after the "-" into numeric, so it can be used as a filtering condition</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>askamanager_data<span class="sc">$</span>Age_Max <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">sapply</span>(split_age, <span class="st">`</span><span class="at">[</span><span class="st">`</span>, <span class="dv">2</span>))</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>askamanager_data<span class="sc">$</span>Total_Exp_Max <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">sapply</span>(split_total_exp, <span class="st">`</span><span class="at">[</span><span class="st">`</span>, <span class="dv">2</span>))</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>askamanager_data<span class="sc">$</span>Field_Exp_Max <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">sapply</span>(split_field_exp, <span class="st">`</span><span class="at">[</span><span class="st">`</span>, <span class="dv">2</span>))</span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>num_rows_before <span class="ot">&lt;-</span> <span class="fu">nrow</span>(askamanager_data)</span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Filtering rows where the age is greater than or equal to 18 (sinceno one starts working before age 18)</span></span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a>askamanager_data_filtered <span class="ot">&lt;-</span> <span class="fu">subset</span>(askamanager_data, Age_Max <span class="sc">&gt;=</span> <span class="dv">18</span>)</span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Filtering rows where the field experience years cannot exceed the total experience years</span></span>
+<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a>askamanager_data_filtered <span class="ot">&lt;-</span> <span class="fu">subset</span>(askamanager_data, Total_Experience_Years <span class="sc">&gt;=</span> Field_Experience_Years)</span>
+<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-24"><a href="#cb30-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Filtering rows where the number of years after 18 cannot exceed the total experience years</span></span>
+<span id="cb30-25"><a href="#cb30-25" aria-hidden="true" tabindex="-1"></a>askamanager_data_filtered <span class="ot">&lt;-</span> <span class="fu">subset</span>(askamanager_data, Age_Max <span class="sc">-</span> <span class="dv">18</span> <span class="sc">&gt;=</span> Total_Experience_Years)</span>
+<span id="cb30-26"><a href="#cb30-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-27"><a href="#cb30-27" aria-hidden="true" tabindex="-1"></a>num_rows_after <span class="ot">&lt;-</span> <span class="fu">nrow</span>(askamanager_data_filtered)                 </span>
+<span id="cb30-28"><a href="#cb30-28" aria-hidden="true" tabindex="-1"></a>                                                </span>
+<span id="cb30-29"><a href="#cb30-29" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Number of rows before filtering:"</span>, num_rows_before, <span class="st">"</span><span class="sc">\n</span><span class="st">Number of rows after filtering:"</span>, num_rows_after)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Number of rows before filtering: 28062 
-Number of rows after filtering: 23374</code></pre>
+Number of rows after filtering: 15650</code></pre>
 </div>
 </div>
-<p>Part (D)</p>
+<p>Part (E) - A lot of the incomes are likely false. Eliminate any rows with extremely low or extremely high salaries. I’ll leave the decision of what thresholds to use up to you; you could choose to eliminate only impossible values, or you could restrict the sample to eliminate the extreme values even if they are realistic (e.g.&nbsp;removing the billionaires or the folks making &lt; $1,000 per year). You must justify your choice, along with either a cited source or an exploration the data, or some combination.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>split_age <span class="ot">&lt;-</span> <span class="fu">strsplit</span>(<span class="fu">as.character</span>(askamanager_data[[<span class="st">"Age_Range"</span>]]), <span class="st">"-"</span>)</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>askamanager_data<span class="sc">$</span>Age_Min <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">sapply</span>(split_age, <span class="st">`</span><span class="at">[</span><span class="st">`</span>, <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: NAs introduced by coercion</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>num_rows_before <span class="ot">&lt;-</span> <span class="fu">nrow</span>(askamanager_data)</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>askamanager_data_filtered <span class="ot">&lt;-</span> askamanager_data[askamanager_data<span class="sc">$</span>Age_min <span class="sc">&gt;=</span> <span class="dv">18</span> <span class="sc">&amp;</span></span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>                                              askamanager_data<span class="sc">$</span>Total_Experience_Years <span class="sc">&lt;=</span> (askamanager_data<span class="sc">$</span>Age_min <span class="sc">-</span> <span class="dv">18</span>) <span class="sc">&amp;</span></span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>                                              askamanager_data<span class="sc">$</span>Field_Experience_Years <span class="sc">&lt;=</span> askamanager_data<span class="sc">$</span>Total_Experience_Years, ]</span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>num_rows_after <span class="ot">&lt;-</span> <span class="fu">nrow</span>(askamanager_data_filtered)</span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Number of rows before filtering:"</span>, num_rows_before, <span class="st">"</span><span class="sc">\n</span><span class="st">Number of rows after filtering:"</span>, num_rows_after)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Number of rows before filtering: 23374 
-Number of rows after filtering: 0</code></pre>
-</div>
-</div>
-<p>Part (E)</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(askamanager_data<span class="sc">$</span>Annual_Salary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(askamanager_data<span class="sc">$</span>Annual_Salary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
-        0     56000     78000     97041    112000 102000000 </code></pre>
+0.000e+00 5.400e+04 7.500e+04 3.614e+05 1.100e+05 6.000e+09 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>lower_threshold <span class="ot">&lt;-</span> <span class="dv">10000</span></span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>upper_threshold <span class="ot">&lt;-</span> <span class="dv">1000000</span></span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>askamanager_data_filtered <span class="ot">&lt;-</span> askamanager_data[askamanager_data<span class="sc">$</span>Annual_Salary <span class="sc">&gt;=</span> lower_threshold <span class="sc">&amp;</span> askamanager_data<span class="sc">$</span>Annual_Salary <span class="sc">&lt;=</span> upper_threshold, ]</span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>final_sample_size <span class="ot">&lt;-</span> <span class="fu">nrow</span>(askamanager_data_filtered)</span>
-<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Final sample size after filtering:"</span>, final_sample_size, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Finding Annual Salary mean</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>salary_mean <span class="ot">&lt;-</span> <span class="fu">mean</span>(askamanager_data<span class="sc">$</span>Annual_Salary, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Finding Annual Salary standard deviation</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>salary_sd <span class="ot">&lt;-</span> <span class="fu">sd</span>(askamanager_data<span class="sc">$</span>Annual_Salary, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Initializing upper and lower bounds</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>lower_thres <span class="ot">&lt;-</span> salary_mean <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> salary_sd</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>upper_thres <span class="ot">&lt;-</span> salary_mean <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> salary_sd</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Filtering based on those thresholds and greater than $1000</span></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>askamanager_data_filtered <span class="ot">&lt;-</span> askamanager_data[</span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>  askamanager_data<span class="sc">$</span>Annual_Salary <span class="sc">&gt;=</span> lower_thres <span class="sc">&amp;</span> </span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>  askamanager_data<span class="sc">$</span>Annual_Salary <span class="sc">&lt;=</span> upper_thres <span class="sc">&amp;</span> </span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>  askamanager_data<span class="sc">$</span>Annual_Salary <span class="sc">&gt;</span> <span class="dv">1000</span>, </span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(askamanager_data_filtered<span class="sc">$</span>Annual_Salary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Final sample size after filtering: 23257 </code></pre>
+<pre><code>    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+    1200    54328    75884   102713   110000 43800000 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>final_sample_size <span class="ot">&lt;-</span> <span class="fu">nrow</span>(askamanager_data_filtered)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Final sample size after filtering:"</span>, final_sample_size, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Final sample size after filtering: 27944 </code></pre>
 </div>
 </div>
-<p>Problem 3 - Palindromic Numbers Part(A)</p>
+<p>The final sample size is 27944. The method that I used is using standard deviation to create my thresholds. I used a standard deviation of 2 so that filtering based on 2 standard deviations above and below will yield about 95% of the annual salaries. Furthermore, I filtered out annual salaries of $1000 or below, which I think is a reasonable lower bound to eliminate the extremely low salaries (of which also eliminates annual salaries that are equal to 0). The summary box before the filtering showed that the max was nearly 6 billion dollars, which is far too extreme. After the filtering, the max is now 43.8 million dollars, which is still really high, but not completely out of the blue if its a rare high earner.</p>
+<h3 class="anchored">
+Problem 3 - Palindromic Numbers
+</h3>
+<p>Part(A) - Write function isPalindromic that checks if a given positive integer is a palindrome. Be sure to provide a reasonable error on an invalid input. Be sure to document your function (see instructions above).</p>
+<p>Input: A positive integer Output: A list with two elements: isPalindromic: A logical value indicating if the input is palindromic. reversed: The input with its digits reversed.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Description:</span></span>
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   Checks if a given positive integer is a palindrome</span></span>
@@ -413,7 +458,8 @@ Number of rows after filtering: 0</code></pre>
 [1] 15993</code></pre>
 </div>
 </div>
-<p>Part(B)</p>
+<p>Part(B) - Create a function nextPalindrome that finds the next palindromic number strictly greater than the input. Be sure to provide a reasonable error on an invalid input.</p>
+<p>Input: A positive integer Output: A vector of length 1 with the next palindromic number greater than the input</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Description:</span></span>
 <span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   Finds the next palindrome number strictly greater than the input</span></span>
@@ -443,7 +489,7 @@ Number of rows after filtering: 0</code></pre>
 <pre><code>[1] 765434567</code></pre>
 </div>
 </div>
-<p>Part(C)</p>
+<p>Part(C) - Use these functions to find the next palindrome for each of the following:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nextPalindrome</span>(<span class="dv">391</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
