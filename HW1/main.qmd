@@ -1,7 +1,9 @@
 ---
 title: "STATS 506 - Homework 1"
 author: "Vincent Weng"
-format: html
+format:
+  html:
+    embed-resources: true
 ---
 
 GitHub Repository Link: https://github.com/VAweng02/STATS-506
