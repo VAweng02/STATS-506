@@ -11,8 +11,9 @@ format:
 Part (A) - Version 1: Implement this game using a loop.
 ```{r}
 play_dice <- function(num_rolls) {
-  total_winnings <- -2
+  total_winnings <- 0
   for (i in 1:num_rolls) {
+    total_winnings <- total_winnings -2 
     roll <- sample(1:6, 1)
     if (roll == 3) {
       total_winnings <- total_winnings + 6
@@ -22,5 +23,67 @@ play_dice <- function(num_rolls) {
   }
   return(total_winnings)
 }
+
+play_dice(3)
+play_dice(3000)
 ```
+
+
+Part (A) - Version 2: Implement this game using built-in R vectorized functions.
+```{r}
+play_dice <- function(num_rolls) {
+  rolls <- sample(1:6, num_rolls, replace = TRUE)
+  winnings <- ifelse(rolls == 3 | rolls == 5, 2 * rolls, -2)
+  return(sum(winnings))
+}
+
+play_dice(3)
+play_dice(3000)
+```
+
+
+Part (A) - Version 3: Implement this by rolling all the dice into one and collapsing the die rolls into a single table()
+```{r}
+# TODO
+```
+
+
+
+<h3>Problem 2 - Linear Regression</h3>
+
+Part(A) - The names of the variables in this data are way too long. Rename the columns of the data to more reasonable lengths.
+```{r}
+cars_data <- read.csv("cars.csv")
+
+colnames(cars_data) <- c("dim_height", "dim_length", "dim_width", "eng_inf_drive_line", "eng_inf_eng_type", "eng_inf_hybrid", "eng_inf_num_forward_gears", "eng_inf_transmission", "fuel_inf_city", "fuel_inf_fuel_type", "fuel_inf_highway", "id_classification", "id_id", "id_make", "id_model_year", "id_year", "eng_inf_eng_stat_horsepower", "eng_inf_eng_stat_torque")
+```
+
+
+Part(B) - Restrict the data to cars whose Fuel Type is “Gasoline”.
+```{r}
+cars_data_filtered <- subset(cars_data, fuel_inf_fuel_type == "Gasoline")
+```
+
+
+Part(C) - Examine the distribution of highway gas mileage. Consider whether a transformation could be used. If so, generate the transformed variable and use this variable going forward. If not, provide a short justification.
+```{r}
+# highway gas mileage of 223 was removed (outlier)
+cars_data_filtered <- subset(cars_data, fuel_inf_highway < 50)
+
+summary(cars_data_filtered$fuel_inf_highway)
+
+hist(cars_data_filtered$fuel_inf_highway, breaks = 25, main = "Distribution of highway gas mileage", xlab = "highway gas mileage", col = "blue")
+```
+Part(D) - Fit a linear regression model predicting MPG on the highway. The predictor of interest is torque. Control for:
+
+- The horsepower of the engine
+- All three dimensions of the car
+- The year the car was released, as a categorical variable.
+
+Briefly discuss the estimated relationship between torque and highway MPG. Be precise about the interpretation of the estimated coefficient.
+
+
+
+
+
 
