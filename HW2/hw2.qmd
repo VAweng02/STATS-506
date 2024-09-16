@@ -1,0 +1,26 @@
+---
+title: "STATS 506 - Homework 2"
+author: "Vincent Weng"
+format:
+  html:
+    embed-resources: true
+---
+
+<h3>Problem 1 - Dice Game</h3>
+
+Part (A) - Version 1: Implement this game using a loop.
+```{r}
+play_dice <- function(num_rolls) {
+  total_winnings <- -2
+  for (i in 1:num_rolls) {
+    roll <- sample(1:6, 1)
+    if (roll == 3) {
+      total_winnings <- total_winnings + 6
+    } else if (roll == 5) {
+      total_winnings <- total_winnings + 10
+    }
+  }
+  return(total_winnings)
+}
+```
+
