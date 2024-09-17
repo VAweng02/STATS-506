@@ -10,11 +10,11 @@ format:
 
 Part (A) - Version 1: Implement this game using a loop.
 ```{r}
-play_dice <- function(num_rolls) {
+play_dice1 <- function(num_rolls) {
   total_winnings <- 0
   for (i in 1:num_rolls) {
     total_winnings <- total_winnings -2 
-    roll <- sample(1:6, 1)
+    roll <- sample(1:6, 1, replace = TRUE)
     if (roll == 3) {
       total_winnings <- total_winnings + 6
     } else if (roll == 5) {
@@ -23,22 +23,17 @@ play_dice <- function(num_rolls) {
   }
   return(total_winnings)
 }
-
-play_dice(3)
-play_dice(3000)
 ```
 
 
 Part (A) - Version 2: Implement this game using built-in R vectorized functions.
 ```{r}
-play_dice <- function(num_rolls) {
+play_dice2 <- function(num_rolls) {
   rolls <- sample(1:6, num_rolls, replace = TRUE)
-  winnings <- ifelse(rolls == 3 | rolls == 5, 2 * rolls, -2)
+  total_winnings <- ifelse(rolls == 3 | rolls == 5, 2 * rolls, -2)
+  total_winnings <- total_winnings - (2*num_rolls)
   return(sum(winnings))
 }
-
-play_dice(3)
-play_dice(3000)
 ```
 
 
@@ -55,22 +50,22 @@ Part(A) - The names of the variables in this data are way too long. Rename the c
 ```{r}
 cars_data <- read.csv("cars.csv")
 
-colnames(cars_data) <- c("dim_height", "dim_length", "dim_width", "eng_inf_drive_line", "eng_inf_eng_type", "eng_inf_hybrid", "eng_inf_num_forward_gears", "eng_inf_transmission", "fuel_inf_city", "fuel_inf_fuel_type", "fuel_inf_highway", "id_classification", "id_id", "id_make", "id_model_year", "id_year", "eng_inf_eng_stat_horsepower", "eng_inf_eng_stat_torque")
+colnames(cars_data) <- c("dim_height", "dim_length", "dim_width", "eng_drive_line", "eng_type", "eng_hybrid", "eng_num_gears", "eng_transmission", "fuel_city_mpg", "fuel_type", "fuel_highway_mpg", "id_class", "id", "id_make", "id_model_year", "id_year", "eng_horsepower", "eng_torque")
 ```
 
 
 Part(B) - Restrict the data to cars whose Fuel Type is “Gasoline”.
 ```{r}
-cars_data_filtered <- subset(cars_data, fuel_inf_fuel_type == "Gasoline")
+gasoline_cars <- cars_data[cars_data$fuel_type == "Gasoline", ]
 ```
 
 
 Part(C) - Examine the distribution of highway gas mileage. Consider whether a transformation could be used. If so, generate the transformed variable and use this variable going forward. If not, provide a short justification.
 ```{r}
 # highway gas mileage of 223 was removed (outlier)
-cars_data_filtered <- subset(cars_data, fuel_inf_highway < 50)
+gasoline_cars <- gasoline_cars[gasoline_cars$fuel_highway_mpg < 50, ]
 
-summary(cars_data_filtered$fuel_inf_highway)
+summary(gasoline_cars$fuel_highway_mpg)
 
 hist(cars_data_filtered$fuel_inf_highway, breaks = 25, main = "Distribution of highway gas mileage", xlab = "highway gas mileage", col = "blue")
 ```
@@ -81,9 +76,15 @@ Part(D) - Fit a linear regression model predicting MPG on the highway. The predi
 - The year the car was released, as a categorical variable.
 
 Briefly discuss the estimated relationship between torque and highway MPG. Be precise about the interpretation of the estimated coefficient.
+```{r}
+model <- lm(fuel_highway_mpg ~ eng_torque + eng_horsepower + dim_length + dim_width + dim_height + as.factor(id_year), data = gasoline_cars)
+summary(model)
+```
 
-
-
+Part(E) - It seems reasonable that there may be an interaction between torque and horsepower. Refit the model (with lm) and generate an interaction plot, showing how the relationship between torque and MPG changes as horsepower changes. Choose reasonable values of torque, and show lines for three different reasonable values of horsepower.
+```{r}
+# TODO
+```
 
 
 
