@@ -10,6 +10,14 @@ format:
 
 Part (A) - Version 1: Implement this game using a loop.
 ```{r}
+#' This is the title of the function
+#'
+#' @description A detailed description of what the function does.
+#'
+#' @param x A parameter that does something.
+#' @param y Another parameter.
+#'
+#' @return The result of the function.
 play_dice1 <- function(num_rolls) {
   total_winnings <- 0
   for (i in 1:num_rolls) {
@@ -63,11 +71,11 @@ gasoline_cars <- cars_data[cars_data$fuel_type == "Gasoline", ]
 Part(C) - Examine the distribution of highway gas mileage. Consider whether a transformation could be used. If so, generate the transformed variable and use this variable going forward. If not, provide a short justification.
 ```{r}
 # highway gas mileage of 223 was removed (outlier)
-gasoline_cars <- gasoline_cars[gasoline_cars$fuel_highway_mpg < 50, ]
+gasoline_cars <- gasoline_cars[gasoline_cars$fuel_city_mpg < 50, ]
 
-summary(gasoline_cars$fuel_highway_mpg)
+summary(gasoline_cars$fuel_city_mpg)
 
-hist(cars_data_filtered$fuel_inf_highway, breaks = 25, main = "Distribution of highway gas mileage", xlab = "highway gas mileage", col = "blue")
+hist(gasoline_cars$fuel_city_mpg, breaks = 25, main = "Distribution of highway gas mileage", xlab = "highway gas mileage", col = "blue")
 ```
 Part(D) - Fit a linear regression model predicting MPG on the highway. The predictor of interest is torque. Control for:
 
@@ -83,7 +91,10 @@ summary(model)
 
 Part(E) - It seems reasonable that there may be an interaction between torque and horsepower. Refit the model (with lm) and generate an interaction plot, showing how the relationship between torque and MPG changes as horsepower changes. Choose reasonable values of torque, and show lines for three different reasonable values of horsepower.
 ```{r}
-# TODO
+model <- lm(fuel_highway_mpg ~ eng_torque*eng_horsepower + dim_length + dim_width + dim_height + as.factor(id_year), data = gasoline_cars)
+
+library(interactions)
+interact_plot(model, pred = eng_horsepower, modx = eng_torque,at = list(id_year = 2012))
 ```
 
 
