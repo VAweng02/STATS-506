@@ -10,14 +10,10 @@ format:
 
 Part (A) - Version 1: Implement this game using a loop.
 ```{r}
-#' This is the title of the function
-#'
-#' @description A detailed description of what the function does.
-#'
-#' @param x A parameter that does something.
-#' @param y Another parameter.
-#'
-#' @return The result of the function.
+#' Dice Game Version 1: Using a loop
+#' @description Plays a dice game
+#' @param num_rolls: Number of dice to roll
+#' @return total_winnings: Total winnings after accumulating wins and losses for the game
 play_dice1 <- function(num_rolls) {
   total_winnings <- 0
   for (i in 1:num_rolls) {
@@ -36,19 +32,79 @@ play_dice1 <- function(num_rolls) {
 
 Part (A) - Version 2: Implement this game using built-in R vectorized functions.
 ```{r}
+#' Dice Game Version 2: Using built-in R vectorized functions
+#' @description Plays a dice game
+#' @param num_rolls: Number of dice to roll
+#' @return total_winnings: Total winnings after accumulating wins and losses for the game
 play_dice2 <- function(num_rolls) {
   rolls <- sample(1:6, num_rolls, replace = TRUE)
-  total_winnings <- ifelse(rolls == 3 | rolls == 5, 2 * rolls, -2)
-  total_winnings <- total_winnings - (2*num_rolls)
-  return(sum(winnings))
+  total_winnings <- ifelse(rolls == 3 | rolls == 5, 2 * rolls, 0)
+  total_winnings <- sum(total_winnings) - (2*num_rolls)
+  return(total_winnings)
 }
 ```
 
 
 Part (A) - Version 3: Implement this by rolling all the dice into one and collapsing the die rolls into a single table()
 ```{r}
-# TODO
+#' Dice Game Version 4: By rolling all dice into one and collapsing die rolls into single table()
+#' @description Plays a dice game
+#' @param num_rolls: Number of dice to roll
+#' @return total_winnings: Total winnings after accumulating wins and losses for the game
+play_dice3 <- function(num_rolls) {
+  dice_rolls <- table(factor(sample(1:6, num_rolls, replace=TRUE), levels=1:6))
+  table <- dice_rolls[3]*6 + dice_rolls[5]*10 - 2*num_rolls
+  return(table)
+}
 ```
+
+
+Part (A) - Version 4: Implement this game by using one of the “apply” functions
+```{r}
+#' Dice Game Version 3: By using one of the “apply” functions
+#' @description Plays a dice game
+#' @param num_rolls: Number of dice to roll
+#' @return total_winnings: Total winnings after accumulating wins and losses for the game
+play_dice4 <- function(num_rolls) {
+  dice_rolls <- sample(1:6, num_rolls, replace=TRUE)
+    
+  return(-2*num_rolls + sum(vapply(dice_rolls, function(roll) {
+    if (roll == 3 | roll == 5) {
+      return(2*roll)
+    } else {
+      return(0)
+    }
+  }, 1)))
+}
+```
+
+
+Part (B) - Demonstrate that all versions work. Do so by running each a few times, once with an input a 3, and once with an input of 3,000
+```{r}
+# Print results for play_dice1
+cat("Results for play_dice1:\n",
+    "Score with 3 rolls:", play_dice1(3), "\n",
+    "Score with 3000 rolls:", play_dice1(3000), "\n\n")
+
+# Print results for play_dice2
+cat("Results for play_dice2:\n",
+    "Score with 3 rolls:", play_dice2(3), "\n",
+    "Score with 3000 rolls:", play_dice2(3000), "\n\n")
+
+# Print results for play_dice3
+cat("Results for play_dice3:\n",
+    "Score with 3 rolls:", play_dice3(3), "\n",
+    "Score with 3000 rolls:", play_dice3(3000), "\n\n")
+
+# Print results for play_dice4
+cat("Results for play_dice4:\n",
+    "Score with 3 rolls:", play_dice4(3), "\n",
+    "Score with 3000 rolls:", play_dice4(3000), "\n")
+
+```
+
+
+
 
 
 

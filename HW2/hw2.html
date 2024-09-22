@@ -3104,65 +3104,130 @@ Problem 1 - Dice Game
 </h3>
 <p>Part (A) - Version 1: Implement this game using a loop.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; This is the title of the function</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @description A detailed description of what the function does.</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @param x A parameter that does something.</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @param y Another parameter.</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @return The result of the function.</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>play_dice1 <span class="ot">&lt;-</span> <span class="cf">function</span>(num_rolls) {</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  total_winnings <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>num_rolls) {</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    total_winnings <span class="ot">&lt;-</span> total_winnings <span class="sc">-</span><span class="dv">2</span> </span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    roll <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>, <span class="dv">1</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (roll <span class="sc">==</span> <span class="dv">3</span>) {</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>      total_winnings <span class="ot">&lt;-</span> total_winnings <span class="sc">+</span> <span class="dv">6</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> <span class="cf">if</span> (roll <span class="sc">==</span> <span class="dv">5</span>) {</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>      total_winnings <span class="ot">&lt;-</span> total_winnings <span class="sc">+</span> <span class="dv">10</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(total_winnings)</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; Dice Game Version 1: Using a loop</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @description Plays a dice game</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @param num_rolls: Number of dice to roll</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @return total_winnings: Total winnings after accumulating wins and losses for the game</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>play_dice1 <span class="ot">&lt;-</span> <span class="cf">function</span>(num_rolls) {</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  total_winnings <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>num_rolls) {</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    total_winnings <span class="ot">&lt;-</span> total_winnings <span class="sc">-</span><span class="dv">2</span> </span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    roll <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>, <span class="dv">1</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (roll <span class="sc">==</span> <span class="dv">3</span>) {</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>      total_winnings <span class="ot">&lt;-</span> total_winnings <span class="sc">+</span> <span class="dv">6</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> <span class="cf">if</span> (roll <span class="sc">==</span> <span class="dv">5</span>) {</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>      total_winnings <span class="ot">&lt;-</span> total_winnings <span class="sc">+</span> <span class="dv">10</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(total_winnings)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Part (A) - Version 2: Implement this game using built-in R vectorized functions.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>play_dice2 <span class="ot">&lt;-</span> <span class="cf">function</span>(num_rolls) {</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  rolls <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>, num_rolls, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  total_winnings <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(rolls <span class="sc">==</span> <span class="dv">3</span> <span class="sc">|</span> rolls <span class="sc">==</span> <span class="dv">5</span>, <span class="dv">2</span> <span class="sc">*</span> rolls, <span class="sc">-</span><span class="dv">2</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  total_winnings <span class="ot">&lt;-</span> total_winnings <span class="sc">-</span> (<span class="dv">2</span><span class="sc">*</span>num_rolls)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">sum</span>(winnings))</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; Dice Game Version 2: Using built-in R vectorized functions</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @description Plays a dice game</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @param num_rolls: Number of dice to roll</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @return total_winnings: Total winnings after accumulating wins and losses for the game</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>play_dice2 <span class="ot">&lt;-</span> <span class="cf">function</span>(num_rolls) {</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  rolls <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>, num_rolls, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  total_winnings <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(rolls <span class="sc">==</span> <span class="dv">3</span> <span class="sc">|</span> rolls <span class="sc">==</span> <span class="dv">5</span>, <span class="dv">2</span> <span class="sc">*</span> rolls, <span class="dv">0</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  total_winnings <span class="ot">&lt;-</span> <span class="fu">sum</span>(total_winnings) <span class="sc">-</span> (<span class="dv">2</span><span class="sc">*</span>num_rolls)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(total_winnings)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Part (A) - Version 3: Implement this by rolling all the dice into one and collapsing the die rolls into a single table()</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; Dice Game Version 4: By rolling all dice into one and collapsing die rolls into single table()</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @description Plays a dice game</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @param num_rolls: Number of dice to roll</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @return total_winnings: Total winnings after accumulating wins and losses for the game</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>play_dice3 <span class="ot">&lt;-</span> <span class="cf">function</span>(num_rolls) {</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  dice_rolls <span class="ot">&lt;-</span> <span class="fu">table</span>(<span class="fu">factor</span>(<span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>, num_rolls, <span class="at">replace=</span><span class="cn">TRUE</span>), <span class="at">levels=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>))</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  table <span class="ot">&lt;-</span> dice_rolls[<span class="dv">3</span>]<span class="sc">*</span><span class="dv">6</span> <span class="sc">+</span> dice_rolls[<span class="dv">5</span>]<span class="sc">*</span><span class="dv">10</span> <span class="sc">-</span> <span class="dv">2</span><span class="sc">*</span>num_rolls</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(table)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Part (A) - Version 4: Implement this game by using one of the “apply” functions</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; Dice Game Version 3: By using one of the “apply” functions</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @description Plays a dice game</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @param num_rolls: Number of dice to roll</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; @return total_winnings: Total winnings after accumulating wins and losses for the game</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>play_dice4 <span class="ot">&lt;-</span> <span class="cf">function</span>(num_rolls) {</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  dice_rolls <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>, num_rolls, <span class="at">replace=</span><span class="cn">TRUE</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="sc">-</span><span class="dv">2</span><span class="sc">*</span>num_rolls <span class="sc">+</span> <span class="fu">sum</span>(<span class="fu">vapply</span>(dice_rolls, <span class="cf">function</span>(roll) {</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (roll <span class="sc">==</span> <span class="dv">3</span> <span class="sc">|</span> roll <span class="sc">==</span> <span class="dv">5</span>) {</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(<span class="dv">2</span><span class="sc">*</span>roll)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(<span class="dv">0</span>)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  }, <span class="dv">1</span>)))</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Part (B) - Demonstrate that all versions work. Do so by running each a few times, once with an input a 3, and once with an input of 3,000</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results for play_dice1</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Results for play_dice1:</span><span class="sc">\n</span><span class="st">&quot;</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Score with 3 rolls:&quot;</span>, <span class="fu">play_dice1</span>(<span class="dv">3</span>), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Score with 3000 rolls:&quot;</span>, <span class="fu">play_dice1</span>(<span class="dv">3000</span>), <span class="st">&quot;</span><span class="sc">\n\n</span><span class="st">&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Results for play_dice1:
+ Score with 3 rolls: -6 
+ Score with 3000 rolls: 2278 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results for play_dice2</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Results for play_dice2:</span><span class="sc">\n</span><span class="st">&quot;</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Score with 3 rolls:&quot;</span>, <span class="fu">play_dice2</span>(<span class="dv">3</span>), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Score with 3000 rolls:&quot;</span>, <span class="fu">play_dice2</span>(<span class="dv">3000</span>), <span class="st">&quot;</span><span class="sc">\n\n</span><span class="st">&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Results for play_dice2:
+ Score with 3 rolls: -6 
+ Score with 3000 rolls: 2014 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results for play_dice3</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Results for play_dice3:</span><span class="sc">\n</span><span class="st">&quot;</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Score with 3 rolls:&quot;</span>, <span class="fu">play_dice3</span>(<span class="dv">3</span>), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Score with 3000 rolls:&quot;</span>, <span class="fu">play_dice3</span>(<span class="dv">3000</span>), <span class="st">&quot;</span><span class="sc">\n\n</span><span class="st">&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Results for play_dice3:
+ Score with 3 rolls: 0 
+ Score with 3000 rolls: 1906 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results for play_dice4</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Results for play_dice4:</span><span class="sc">\n</span><span class="st">&quot;</span>,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Score with 3 rolls:&quot;</span>, <span class="fu">play_dice4</span>(<span class="dv">3</span>), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Score with 3000 rolls:&quot;</span>, <span class="fu">play_dice4</span>(<span class="dv">3000</span>), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Results for play_dice4:
+ Score with 3 rolls: 0 
+ Score with 3000 rolls: 2148 </code></pre>
+</div>
 </div>
 <h3 class="anchored">
 Problem 2 - Linear Regression
 </h3>
 <p>Part(A) - The names of the variables in this data are way too long. Rename the columns of the data to more reasonable lengths.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>cars_data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;cars.csv&quot;</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(cars_data) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;dim_height&quot;</span>, <span class="st">&quot;dim_length&quot;</span>, <span class="st">&quot;dim_width&quot;</span>, <span class="st">&quot;eng_drive_line&quot;</span>, <span class="st">&quot;eng_type&quot;</span>, <span class="st">&quot;eng_hybrid&quot;</span>, <span class="st">&quot;eng_num_gears&quot;</span>, <span class="st">&quot;eng_transmission&quot;</span>, <span class="st">&quot;fuel_city_mpg&quot;</span>, <span class="st">&quot;fuel_type&quot;</span>, <span class="st">&quot;fuel_highway_mpg&quot;</span>, <span class="st">&quot;id_class&quot;</span>, <span class="st">&quot;id&quot;</span>, <span class="st">&quot;id_make&quot;</span>, <span class="st">&quot;id_model_year&quot;</span>, <span class="st">&quot;id_year&quot;</span>, <span class="st">&quot;eng_horsepower&quot;</span>, <span class="st">&quot;eng_torque&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>cars_data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;cars.csv&quot;</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(cars_data) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;dim_height&quot;</span>, <span class="st">&quot;dim_length&quot;</span>, <span class="st">&quot;dim_width&quot;</span>, <span class="st">&quot;eng_drive_line&quot;</span>, <span class="st">&quot;eng_type&quot;</span>, <span class="st">&quot;eng_hybrid&quot;</span>, <span class="st">&quot;eng_num_gears&quot;</span>, <span class="st">&quot;eng_transmission&quot;</span>, <span class="st">&quot;fuel_city_mpg&quot;</span>, <span class="st">&quot;fuel_type&quot;</span>, <span class="st">&quot;fuel_highway_mpg&quot;</span>, <span class="st">&quot;id_class&quot;</span>, <span class="st">&quot;id&quot;</span>, <span class="st">&quot;id_make&quot;</span>, <span class="st">&quot;id_model_year&quot;</span>, <span class="st">&quot;id_year&quot;</span>, <span class="st">&quot;eng_horsepower&quot;</span>, <span class="st">&quot;eng_torque&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Part(B) - Restrict the data to cars whose Fuel Type is “Gasoline”.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>gasoline_cars <span class="ot">&lt;-</span> cars_data[cars_data<span class="sc">$</span>fuel_type <span class="sc">==</span> <span class="st">&quot;Gasoline&quot;</span>, ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>gasoline_cars <span class="ot">&lt;-</span> cars_data[cars_data<span class="sc">$</span>fuel_type <span class="sc">==</span> <span class="st">&quot;Gasoline&quot;</span>, ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Part(C) - Examine the distribution of highway gas mileage. Consider whether a transformation could be used. If so, generate the transformed variable and use this variable going forward. If not, provide a short justification.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># highway gas mileage of 223 was removed (outlier)</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>gasoline_cars <span class="ot">&lt;-</span> gasoline_cars[gasoline_cars<span class="sc">$</span>fuel_city_mpg <span class="sc">&lt;</span> <span class="dv">50</span>, ]</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(gasoline_cars<span class="sc">$</span>fuel_city_mpg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># highway gas mileage of 223 was removed (outlier)</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>gasoline_cars <span class="ot">&lt;-</span> gasoline_cars[gasoline_cars<span class="sc">$</span>fuel_city_mpg <span class="sc">&lt;</span> <span class="dv">50</span>, ]</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(gasoline_cars<span class="sc">$</span>fuel_city_mpg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
     9.0    15.0    17.0    17.9    20.0    38.0 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(gasoline_cars<span class="sc">$</span>fuel_city_mpg, <span class="at">breaks =</span> <span class="dv">25</span>, <span class="at">main =</span> <span class="st">&quot;Distribution of highway gas mileage&quot;</span>, <span class="at">xlab =</span> <span class="st">&quot;highway gas mileage&quot;</span>, <span class="at">col =</span> <span class="st">&quot;blue&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(gasoline_cars<span class="sc">$</span>fuel_city_mpg, <span class="at">breaks =</span> <span class="dv">25</span>, <span class="at">main =</span> <span class="st">&quot;Distribution of highway gas mileage&quot;</span>, <span class="at">xlab =</span> <span class="st">&quot;highway gas mileage&quot;</span>, <span class="at">col =</span> <span class="st">&quot;blue&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -3179,8 +3244,8 @@ Problem 2 - Linear Regression
 </ul>
 <p>Briefly discuss the estimated relationship between torque and highway MPG. Be precise about the interpretation of the estimated coefficient.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">lm</span>(fuel_highway_mpg <span class="sc">~</span> eng_torque <span class="sc">+</span> eng_horsepower <span class="sc">+</span> dim_length <span class="sc">+</span> dim_width <span class="sc">+</span> dim_height <span class="sc">+</span> <span class="fu">as.factor</span>(id_year), <span class="at">data =</span> gasoline_cars)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">lm</span>(fuel_highway_mpg <span class="sc">~</span> eng_torque <span class="sc">+</span> eng_horsepower <span class="sc">+</span> dim_length <span class="sc">+</span> dim_width <span class="sc">+</span> dim_height <span class="sc">+</span> <span class="fu">as.factor</span>(id_year), <span class="at">data =</span> gasoline_cars)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -3213,10 +3278,10 @@ F-statistic: 413.3 on 8 and 4582 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 <p>Part(E) - It seems reasonable that there may be an interaction between torque and horsepower. Refit the model (with lm) and generate an interaction plot, showing how the relationship between torque and MPG changes as horsepower changes. Choose reasonable values of torque, and show lines for three different reasonable values of horsepower.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">lm</span>(fuel_highway_mpg <span class="sc">~</span> eng_torque<span class="sc">*</span>eng_horsepower <span class="sc">+</span> dim_length <span class="sc">+</span> dim_width <span class="sc">+</span> dim_height <span class="sc">+</span> <span class="fu">as.factor</span>(id_year), <span class="at">data =</span> gasoline_cars)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(interactions)</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">interact_plot</span>(model, <span class="at">pred =</span> eng_horsepower, <span class="at">modx =</span> eng_torque,<span class="at">at =</span> <span class="fu">list</span>(<span class="at">id_year =</span> <span class="dv">2012</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">lm</span>(fuel_highway_mpg <span class="sc">~</span> eng_torque<span class="sc">*</span>eng_horsepower <span class="sc">+</span> dim_length <span class="sc">+</span> dim_width <span class="sc">+</span> dim_height <span class="sc">+</span> <span class="fu">as.factor</span>(id_year), <span class="at">data =</span> gasoline_cars)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(interactions)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="fu">interact_plot</span>(model, <span class="at">pred =</span> eng_horsepower, <span class="at">modx =</span> eng_torque,<span class="at">at =</span> <span class="fu">list</span>(<span class="at">id_year =</span> <span class="dv">2012</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Using data gasoline_cars from global environment. This could cause
 incorrect results if gasoline_cars has been altered since the model was
