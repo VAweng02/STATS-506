@@ -47,7 +47,7 @@ play_dice2 <- function(num_rolls) {
 
 Part (A) - Version 3: Implement this by rolling all the dice into one and collapsing the die rolls into a single table()
 ```{r}
-#' Dice Game Version 4: By rolling all dice into one and collapsing die rolls into single table()
+#' Dice Game Version 3: By rolling all dice into one and collapsing die rolls into single table()
 #' @description Plays a dice game
 #' @param num_rolls: Number of dice to roll
 #' @return total_winnings: Total winnings after accumulating wins and losses for the game
@@ -61,7 +61,7 @@ play_dice3 <- function(num_rolls) {
 
 Part (A) - Version 4: Implement this game by using one of the “apply” functions
 ```{r}
-#' Dice Game Version 3: By using one of the “apply” functions
+#' Dice Game Version 4: By using one of the “apply” functions
 #' @description Plays a dice game
 #' @param num_rolls: Number of dice to roll
 #' @return total_winnings: Total winnings after accumulating wins and losses for the game
@@ -104,6 +104,118 @@ cat("Results for play_dice4:\n",
 ```
 
 
+Part (C) - Demonstrate that the four versions give the same result. Test with inputs 3 and 3,000. (You will need to add a way to control the randomization.)
+```{r}
+#' Dice Game Version 1: Using a loop
+#' @description Plays a dice game
+#' @param num_rolls: Number of dice to roll
+#' @param seed: Sets a seed (NULL if not provided)
+#' @return total_winnings: Total winnings after accumulating wins and losses for the game
+play_dice1 <- function(num_rolls, seed = NULL) {
+  set.seed(seed)
+  total_winnings <- 0
+  for (i in 1:num_rolls) {
+    total_winnings <- total_winnings -2 
+    roll <- sample(1:6, 1, replace = TRUE)
+    if (roll == 3) {
+      total_winnings <- total_winnings + 6
+    } else if (roll == 5) {
+      total_winnings <- total_winnings + 10
+    }
+  }
+  return(total_winnings)
+}
+
+
+#' Dice Game Version 2: Using built-in R vectorized functions
+#' @description Plays a dice game
+#' @param num_rolls: Number of dice to roll
+#' @param seed: Sets a seed (NULL if not provided)
+#' @return total_winnings: Total winnings after accumulating wins and losses for the game
+play_dice2 <- function(num_rolls, seed = NULL) {
+  set.seed(seed)
+  rolls <- sample(1:6, num_rolls, replace = TRUE)
+  total_winnings <- ifelse(rolls == 3 | rolls == 5, 2 * rolls, 0)
+  total_winnings <- sum(total_winnings) - (2*num_rolls)
+  return(total_winnings)
+}
+
+
+#' Dice Game Version 3: By rolling all dice into one and collapsing die rolls into single table()
+#' @description Plays a dice game
+#' @param num_rolls: Number of dice to roll
+#' @param seed: Sets a seed (NULL if not provided)
+#' @return total_winnings: Total winnings after accumulating wins and losses for the game
+play_dice3 <- function(num_rolls, seed = NULL) {
+  set.seed(seed)
+  dice_rolls <- table(factor(sample(1:6, num_rolls, replace=TRUE), levels=1:6))
+  table <- dice_rolls[3]*6 + dice_rolls[5]*10 - 2*num_rolls
+  return(table)
+}
+
+
+#' Dice Game Version 4: By using one of the “apply” functions
+#' @description Plays a dice game
+#' @param num_rolls: Number of dice to roll
+#' @param seed: Sets a seed (NULL if not provided)
+#' @return total_winnings: Total winnings after accumulating wins and losses for the game
+play_dice4 <- function(num_rolls, seed = NULL) {
+  set.seed(seed)
+  dice_rolls <- sample(1:6, num_rolls, replace=TRUE)
+    
+  return(-2*num_rolls + sum(vapply(dice_rolls, function(roll) {
+    if (roll == 3 | roll == 5) {
+      return(2*roll)
+    } else {
+      return(0)
+    }
+  }, 1)))
+}
+
+
+# Print results for play_dice1
+cat("Results for play_dice1:\n",
+    "Score with 3 rolls:", play_dice1(3, seed = 111), "\n",
+    "Score with 3000 rolls:", play_dice1(3000, seed = 111), "\n\n")
+
+# Print results for play_dice2
+cat("Results for play_dice2:\n",
+    "Score with 3 rolls:", play_dice2(3, seed = 111), "\n",
+    "Score with 3000 rolls:", play_dice2(3000, seed = 111), "\n\n")
+
+# Print results for play_dice3
+cat("Results for play_dice3:\n",
+    "Score with 3 rolls:", play_dice3(3, seed = 111), "\n",
+    "Score with 3000 rolls:", play_dice3(3000, seed = 111), "\n\n")
+
+# Print results for play_dice4
+cat("Results for play_dice4:\n",
+    "Score with 3 rolls:", play_dice4(3, seed = 111), "\n",
+    "Score with 3000 rolls:", play_dice4(3000, seed = 111), "\n")
+
+```
+
+
+Part(D) - Use the microbenchmark package to clearly demonstrate the speed of the implementations. Compare performance with a low input (1,000) and a large input (100,000). Discuss the results
+```{r}
+library(microbenchmark)
+microbenchmark(loop = play_dice1(1000, seed = 111),
+               vectorized = play_dice2(1000, seed = 111),
+               table = play_dice3(1000, seed = 111),
+               apply = play_dice3(1000, seed = 111))
+```
+
+Part(E) - Do you think this is a fair game? Defend your decision with evidence based upon a Monte Carlo simulation.
+```{r}
+reps <- 10000
+sim <- vector(length=reps)
+for (i in 1:reps) {
+  sim[i] <- play_dice2(1000)
+}
+hist(sim)
+abline(v=mean(save), col='red')
+```
+This not a fair game, because the Monte Carlo simluation shows that the expected value (average outcome) of the game is not equal to zero.
 
 
 
