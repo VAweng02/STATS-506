@@ -13,16 +13,20 @@ Part (A) - Version 1: Implement this game using a loop.
 #' Dice Game Version 1: Using a loop
 #' @description Plays a dice game
 #' @param num_rolls: Number of dice to roll
-#' @return total_winnings: Total winnings after accumulating wins and losses for the game
+#' @return total_winnings: Total winnings after accumulating wins and losses
 play_dice1 <- function(num_rolls) {
-  total_winnings <- 0
+  total_winnings <- 0 # initialize total winnings at 0 before rolling
+  
+  # simulates 'num_rolls' times from 1 to 6 with replacement
+  roll <- sample(1:6, num_rolls, replace = TRUE)
+  
+  # loops through each singular roll
   for (i in 1:num_rolls) {
-    total_winnings <- total_winnings -2 
-    roll <- sample(1:6, 1, replace = TRUE)
-    if (roll == 3) {
-      total_winnings <- total_winnings + 6
-    } else if (roll == 5) {
-      total_winnings <- total_winnings + 10
+    total_winnings <- total_winnings - 2 # subtracts $2 to roll each time
+    if (roll[i] == 3) {
+      total_winnings <- total_winnings + 6 # if the roll is 3, you win $6
+    } else if (roll[i] == 5) {
+      total_winnings <- total_winnings + 10 # if you roll a 5, you win $10
     }
   }
   return(total_winnings)
@@ -35,11 +39,17 @@ Part (A) - Version 2: Implement this game using built-in R vectorized functions.
 #' Dice Game Version 2: Using built-in R vectorized functions
 #' @description Plays a dice game
 #' @param num_rolls: Number of dice to roll
-#' @return total_winnings: Total winnings after accumulating wins and losses for the game
+#' @return total_winnings: Total winnings after accumulating wins and losses
 play_dice2 <- function(num_rolls) {
+  # simulates 'num_rolls' times from 1 to 6 with replacement
   rolls <- sample(1:6, num_rolls, replace = TRUE)
+  
+  # calculate total winnings: 2 times the roll value if it's 3 or 5, otherwise 0.
   total_winnings <- ifelse(rolls == 3 | rolls == 5, 2 * rolls, 0)
+  
+  # sums total from winning rolls and subtracting $2 for each roll
   total_winnings <- sum(total_winnings) - (2*num_rolls)
+  
   return(total_winnings)
 }
 ```
@@ -50,9 +60,12 @@ Part (A) - Version 3: Implement this by rolling all the dice into one and collap
 #' Dice Game Version 3: By rolling all dice into one and collapsing die rolls into single table()
 #' @description Plays a dice game
 #' @param num_rolls: Number of dice to roll
-#' @return total_winnings: Total winnings after accumulating wins and losses for the game
+#' @return total_winnings: Total winnings after accumulating wins and losses
 play_dice3 <- function(num_rolls) {
+  # table of count occurrences of each dice roll (1 to 6) over 'num_rolls'
   dice_rolls <- table(factor(sample(1:6, num_rolls, replace=TRUE), levels=1:6))
+  
+  # total winnings: $6 for 3 rolled, 10$ for 5 rolled, minus 2 per roll
   table <- dice_rolls[3]*6 + dice_rolls[5]*10 - 2*num_rolls
   return(table)
 }
@@ -64,43 +77,43 @@ Part (A) - Version 4: Implement this game by using one of the “apply” functi
 #' Dice Game Version 4: By using one of the “apply” functions
 #' @description Plays a dice game
 #' @param num_rolls: Number of dice to roll
-#' @return total_winnings: Total winnings after accumulating wins and losses for the game
+#' @return total_winnings: Total winnings after accumulating wins and losses
 play_dice4 <- function(num_rolls) {
+  # simulates 'num_rolls' times from 1 to 6 with replacement
   dice_rolls <- sample(1:6, num_rolls, replace=TRUE)
     
+  # calculate total winnings: -2 for each roll, plus winnings based on rolled values
   return(-2*num_rolls + sum(vapply(dice_rolls, function(roll) {
+    # return $6 for 3 rolled and $10 for 5 rolled
     if (roll == 3 | roll == 5) {
       return(2*roll)
-    } else {
+    } else { # otherwise, return 0 for that roll
       return(0)
     }
-  }, 1)))
+  }, 1))) # vapply returns vector of winnings for each roll
 }
 ```
 
 
 Part (B) - Demonstrate that all versions work. Do so by running each a few times, once with an input a 3, and once with an input of 3,000
 ```{r}
-# Print results for play_dice1
-cat("Results for play_dice1:\n",
-    "Score with 3 rolls:", play_dice1(3), "\n",
-    "Score with 3000 rolls:", play_dice1(3000), "\n\n")
-
-# Print results for play_dice2
-cat("Results for play_dice2:\n",
-    "Score with 3 rolls:", play_dice2(3), "\n",
-    "Score with 3000 rolls:", play_dice2(3000), "\n\n")
-
-# Print results for play_dice3
-cat("Results for play_dice3:\n",
-    "Score with 3 rolls:", play_dice3(3), "\n",
-    "Score with 3000 rolls:", play_dice3(3000), "\n\n")
-
-# Print results for play_dice4
-cat("Results for play_dice4:\n",
-    "Score with 3 rolls:", play_dice4(3), "\n",
-    "Score with 3000 rolls:", play_dice4(3000), "\n")
-
+cat(
+  "Results for play_dice1:\n",
+  "Total winnings with 3 rolls:", play_dice1(3), "\n",
+  "Total winnings with 3000 rolls:", play_dice1(3000), "\n\n",
+  
+  "Results for play_dice2:\n",
+  "Total winnings with 3 rolls:", play_dice2(3), "\n",
+  "Total winnings with 3000 rolls:", play_dice2(3000), "\n\n",
+  
+  "Results for play_dice3:\n",
+  "Total winnings with 3 rolls:", play_dice3(3), "\n",
+  "Total winnings with 3000 rolls:", play_dice3(3000), "\n\n",
+  
+  "Results for play_dice4:\n",
+  "Total winnings with 3 rolls:", play_dice4(3), "\n",
+  "Total winnings with 3000 rolls:", play_dice4(3000), "\n"
+)
 ```
 
 
@@ -110,17 +123,21 @@ Part (C) - Demonstrate that the four versions give the same result. Test with in
 #' @description Plays a dice game
 #' @param num_rolls: Number of dice to roll
 #' @param seed: Sets a seed (NULL if not provided)
-#' @return total_winnings: Total winnings after accumulating wins and losses for the game
+#' @return total_winnings: Total winnings after accumulating wins and losses
 play_dice1 <- function(num_rolls, seed = NULL) {
-  set.seed(seed)
-  total_winnings <- 0
+  set.seed(seed) # sets the seed 
+  total_winnings <- 0 # initialize total winnings at 0 before rolling
+  
+  # simulates 'num_rolls' times from 1 to 6 with replacement
+  roll <- sample(1:6, num_rolls, replace = TRUE)
+  
+  # loops through each singular roll
   for (i in 1:num_rolls) {
-    total_winnings <- total_winnings -2 
-    roll <- sample(1:6, 1, replace = TRUE)
-    if (roll == 3) {
-      total_winnings <- total_winnings + 6
-    } else if (roll == 5) {
-      total_winnings <- total_winnings + 10
+    total_winnings <- total_winnings - 2 # subtracts $2 to roll each time
+    if (roll[i] == 3) {
+      total_winnings <- total_winnings + 6 # if the roll is 3, you win $6
+    } else if (roll[i] == 5) {
+      total_winnings <- total_winnings + 10 # if you roll a 5, you win $10
     }
   }
   return(total_winnings)
@@ -130,13 +147,19 @@ play_dice1 <- function(num_rolls, seed = NULL) {
 #' Dice Game Version 2: Using built-in R vectorized functions
 #' @description Plays a dice game
 #' @param num_rolls: Number of dice to roll
-#' @param seed: Sets a seed (NULL if not provided)
-#' @return total_winnings: Total winnings after accumulating wins and losses for the game
+#' @return total_winnings: Total winnings after accumulating wins and losses
 play_dice2 <- function(num_rolls, seed = NULL) {
-  set.seed(seed)
+  set.seed(seed) # sets the seed 
+  
+  # simulates 'num_rolls' times from 1 to 6 with replacement
   rolls <- sample(1:6, num_rolls, replace = TRUE)
+  
+  # calculate total winnings: 2 times the roll value if it's 3 or 5, otherwise 0.
   total_winnings <- ifelse(rolls == 3 | rolls == 5, 2 * rolls, 0)
+  
+  # sums total from winning rolls and subtracting $2 for each roll
   total_winnings <- sum(total_winnings) - (2*num_rolls)
+  
   return(total_winnings)
 }
 
@@ -144,11 +167,14 @@ play_dice2 <- function(num_rolls, seed = NULL) {
 #' Dice Game Version 3: By rolling all dice into one and collapsing die rolls into single table()
 #' @description Plays a dice game
 #' @param num_rolls: Number of dice to roll
-#' @param seed: Sets a seed (NULL if not provided)
-#' @return total_winnings: Total winnings after accumulating wins and losses for the game
+#' @return total_winnings: Total winnings after accumulating wins and losses
 play_dice3 <- function(num_rolls, seed = NULL) {
-  set.seed(seed)
+  set.seed(seed) # sets the seed 
+  
+  # table of count occurrences of each dice roll (1 to 6) over 'num_rolls'
   dice_rolls <- table(factor(sample(1:6, num_rolls, replace=TRUE), levels=1:6))
+  
+  # total winnings: $6 for 3 rolled, 10$ for 5 rolled, minus 2 per roll
   table <- dice_rolls[3]*6 + dice_rolls[5]*10 - 2*num_rolls
   return(table)
 }
@@ -157,41 +183,41 @@ play_dice3 <- function(num_rolls, seed = NULL) {
 #' Dice Game Version 4: By using one of the “apply” functions
 #' @description Plays a dice game
 #' @param num_rolls: Number of dice to roll
-#' @param seed: Sets a seed (NULL if not provided)
-#' @return total_winnings: Total winnings after accumulating wins and losses for the game
+#' @return total_winnings: Total winnings after accumulating wins and losses
 play_dice4 <- function(num_rolls, seed = NULL) {
-  set.seed(seed)
+  set.seed(seed) # sets the seed 
+
+  # simulates 'num_rolls' times from 1 to 6 with replacement
   dice_rolls <- sample(1:6, num_rolls, replace=TRUE)
     
+  # calculate total winnings: -2 for each roll, plus winnings based on rolled values
   return(-2*num_rolls + sum(vapply(dice_rolls, function(roll) {
+    # return $6 for 3 rolled and $10 for 5 rolled
     if (roll == 3 | roll == 5) {
       return(2*roll)
-    } else {
+    } else { # otherwise, return 0 for that roll
       return(0)
     }
-  }, 1)))
+  }, 1))) # vapply returns vector of winnings for each roll
 }
 
-
-# Print results for play_dice1
-cat("Results for play_dice1:\n",
-    "Score with 3 rolls:", play_dice1(3, seed = 111), "\n",
-    "Score with 3000 rolls:", play_dice1(3000, seed = 111), "\n\n")
-
-# Print results for play_dice2
-cat("Results for play_dice2:\n",
-    "Score with 3 rolls:", play_dice2(3, seed = 111), "\n",
-    "Score with 3000 rolls:", play_dice2(3000, seed = 111), "\n\n")
-
-# Print results for play_dice3
-cat("Results for play_dice3:\n",
-    "Score with 3 rolls:", play_dice3(3, seed = 111), "\n",
-    "Score with 3000 rolls:", play_dice3(3000, seed = 111), "\n\n")
-
-# Print results for play_dice4
-cat("Results for play_dice4:\n",
-    "Score with 3 rolls:", play_dice4(3, seed = 111), "\n",
-    "Score with 3000 rolls:", play_dice4(3000, seed = 111), "\n")
+cat(
+  "Results for play_dice1:\n",
+  "Total winnings with 3 rolls:", play_dice1(3, seed = 111), "\n",
+  "Total winnings with 3000 rolls:", play_dice1(3000, seed = 111), "\n\n",
+  
+  "Results for play_dice2:\n",
+  "Total winnings with 3 rolls:", play_dice2(3, seed = 111), "\n",
+  "Total winnings with 3000 rolls:", play_dice2(3000, seed = 111), "\n\n",
+  
+  "Results for play_dice3:\n",
+  "Total winnings with 3 rolls:", play_dice3(3, seed = 111), "\n",
+  "Total winnings with 3000 rolls:", play_dice3(3000, seed = 111), "\n\n",
+  
+  "Results for play_dice4:\n",
+  "Total winnings with 3 rolls:", play_dice4(3, seed = 111), "\n",
+  "Total winnings with 3000 rolls:", play_dice4(3000, seed = 111), "\n"
+)
 
 ```
 
@@ -203,20 +229,41 @@ microbenchmark(loop = play_dice1(1000, seed = 111),
                vectorized = play_dice2(1000, seed = 111),
                table = play_dice3(1000, seed = 111),
                apply = play_dice3(1000, seed = 111))
+
+microbenchmark(loop = play_dice1(100000, seed = 111),
+               vectorized = play_dice2(100000, seed = 111),
+               table = play_dice3(100000, seed = 111),
+               apply = play_dice3(100000, seed = 111))
+
 ```
+For low input of 1000, vectorized is by far the fastest. Then using a loop is the next fastest, followed by table(). Finally, vapply() looks like to be the slowest, but not that much slower than table() (since the difference is minimal).
+
+For large input of 100000, vectorized is still the fastest. Then vapply() is the next fastest, followed by table(). Finally, using a loop is by the slowest. 
+
+In conclusion, it looks like vectorized has the fastest performance no matter the input size. Furthermore, it looks like table() and vapply() have pretty similar speeds that was consistent for both the low and large input. Finally, using a loop seems seems to be slower when compared to table() and vapply() after the input size increased substantially.
+
+
 
 Part(E) - Do you think this is a fair game? Defend your decision with evidence based upon a Monte Carlo simulation.
 ```{r}
-reps <- 10000
-sim <- vector(length=reps)
-for (i in 1:reps) {
-  sim[i] <- play_dice2(1000)
-}
-hist(sim)
-abline(v=mean(save), col='red')
-```
-This not a fair game, because the Monte Carlo simluation shows that the expected value (average outcome) of the game is not equal to zero.
+reps <- 10000 # set number of repetitions for simulation
 
+# initialize vector that stores each simulation run
+sim <- vector(length = reps)
+
+# loop through each rep to simulate dice game
+for (i in 1:reps) {
+  # store result with 1000 rolls in the sim vector
+  sim[i] <- play_dice1(1000)
+}
+
+# graphs histogram to visualize the distribution of total winnings
+hist(sim)
+
+# Add a vertical line to the histogram at the mean of the simulated results
+abline(v = mean(sim), col = 'blue')
+```
+This not a fair game, because the Monte Carlo simluation shows that the expected value (average outcome) of the game is not equal or close to zero.
 
 
 
@@ -224,14 +271,16 @@ This not a fair game, because the Monte Carlo simluation shows that the expected
 
 Part(A) - The names of the variables in this data are way too long. Rename the columns of the data to more reasonable lengths.
 ```{r}
-cars_data <- read.csv("cars.csv")
+cars_data <- read.csv("cars.csv") # read in cars dataframe
 
+# rename column name of each variable
 colnames(cars_data) <- c("dim_height", "dim_length", "dim_width", "eng_drive_line", "eng_type", "eng_hybrid", "eng_num_gears", "eng_transmission", "fuel_city_mpg", "fuel_type", "fuel_highway_mpg", "id_class", "id", "id_make", "id_model_year", "id_year", "eng_horsepower", "eng_torque")
 ```
 
 
 Part(B) - Restrict the data to cars whose Fuel Type is “Gasoline”.
 ```{r}
+# restrict cars_data to cars whose fuel type is “Gasoline”
 gasoline_cars <- cars_data[cars_data$fuel_type == "Gasoline", ]
 ```
 
@@ -243,7 +292,21 @@ gasoline_cars <- gasoline_cars[gasoline_cars$fuel_city_mpg < 50, ]
 
 summary(gasoline_cars$fuel_city_mpg)
 
-hist(gasoline_cars$fuel_city_mpg, breaks = 25, main = "Distribution of highway gas mileage", xlab = "highway gas mileage", col = "blue")
+hist(gasoline_cars$fuel_city_mpg, 
+     breaks = 20, 
+     main = "Distribution of highway gas mileage", 
+     xlab = "highway gas mileage", 
+     col = "blue")
+
+# create new variable "log_fuel_city_mpg" for log-transformed fuel_city_mpg
+gasoline_cars$log_fuel_city_mpg <- log(gasoline_cars$fuel_city_mpg)
+
+# histogram of log-transformed gas mileage
+hist(gasoline_cars$log_fuel_city_mpg, 
+     breaks = 20, 
+     main="Log-Transformed Highway Gas Mileage", 
+     xlab="Log(Gas Mileage)",
+     col = "blue")
 ```
 Part(D) - Fit a linear regression model predicting MPG on the highway. The predictor of interest is torque. Control for:
 
@@ -253,7 +316,7 @@ Part(D) - Fit a linear regression model predicting MPG on the highway. The predi
 
 Briefly discuss the estimated relationship between torque and highway MPG. Be precise about the interpretation of the estimated coefficient.
 ```{r}
-model <- lm(fuel_highway_mpg ~ eng_torque + eng_horsepower + dim_length + dim_width + dim_height + as.factor(id_year), data = gasoline_cars)
+model <- lm(log_fuel_city_mpg ~ eng_torque + eng_horsepower + dim_length + dim_width + dim_height + as.factor(id_year), data = gasoline_cars)
 summary(model)
 ```
 
