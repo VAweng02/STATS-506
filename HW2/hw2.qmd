@@ -288,26 +288,20 @@ gasoline_cars <- cars_data[cars_data$fuel_type == "Gasoline", ]
 Part(C) - Examine the distribution of highway gas mileage. Consider whether a transformation could be used. If so, generate the transformed variable and use this variable going forward. If not, provide a short justification.
 ```{r}
 # highway gas mileage of 223 was removed (outlier)
-gasoline_cars <- gasoline_cars[gasoline_cars$fuel_city_mpg < 50, ]
+ gasoline_cars <- gasoline_cars[gasoline_cars$fuel_highway_mpg < 50, ]
 
-summary(gasoline_cars$fuel_city_mpg)
+# showing outlier has been removed
+summary(gasoline_cars$fuel_highway_mpg)
 
-hist(gasoline_cars$fuel_city_mpg, 
-     breaks = 20, 
+# showing distribution of highway MPG
+hist(gasoline_cars$fuel_highway_mpg, 
      main = "Distribution of highway gas mileage", 
      xlab = "highway gas mileage", 
      col = "blue")
-
-# create new variable "log_fuel_city_mpg" for log-transformed fuel_city_mpg
-gasoline_cars$log_fuel_city_mpg <- log(gasoline_cars$fuel_city_mpg)
-
-# histogram of log-transformed gas mileage
-hist(gasoline_cars$log_fuel_city_mpg, 
-     breaks = 20, 
-     main="Log-Transformed Highway Gas Mileage", 
-     xlab="Log(Gas Mileage)",
-     col = "blue")
 ```
+There was an outlier of fuel_highway_mpg that was equal to 223, so I removed that from the data. Furthermore, the histogram shows that the highway MPG is pretty close to representing a normal distribution, so no transformation is needed.
+
+
 Part(D) - Fit a linear regression model predicting MPG on the highway. The predictor of interest is torque. Control for:
 
 - The horsepower of the engine
@@ -316,17 +310,45 @@ Part(D) - Fit a linear regression model predicting MPG on the highway. The predi
 
 Briefly discuss the estimated relationship between torque and highway MPG. Be precise about the interpretation of the estimated coefficient.
 ```{r}
-model <- lm(log_fuel_city_mpg ~ eng_torque + eng_horsepower + dim_length + dim_width + dim_height + as.factor(id_year), data = gasoline_cars)
+# running linear regression model with predictor torque and controlling for the other variables
+model <- lm(fuel_highway_mpg ~ eng_torque + eng_horsepower + dim_length + dim_width + dim_height + as.factor(id_year), data = gasoline_cars)
+
+# showing summary of the regression results
 summary(model)
 ```
+Torque and highway MPG has significant negative relationship. This means that on average, the model predics that higher torque yields a lower highway MPG. This is statistically significant, because the p-value is less than 0.05.
+
 
 Part(E) - It seems reasonable that there may be an interaction between torque and horsepower. Refit the model (with lm) and generate an interaction plot, showing how the relationship between torque and MPG changes as horsepower changes. Choose reasonable values of torque, and show lines for three different reasonable values of horsepower.
 ```{r}
+library(interactions)
+library(emmeans)
+
+# lm() for generating interaction plot between torque and highway MPG, as horsepower changes
 model <- lm(fuel_highway_mpg ~ eng_torque*eng_horsepower + dim_length + dim_width + dim_height + as.factor(id_year), data = gasoline_cars)
 
-library(interactions)
-interact_plot(model, pred = eng_horsepower, modx = eng_torque,at = list(id_year = 2012))
+# using emmip()
+emmip(model, eng_horsepower ~ eng_torque, at = list(eng_horsepower = c(150, 350, 550), eng_torque = c(150, 260, 420)))
+
+# using interact_plot()
+interact_plot(model, pred = eng_torque, modx = eng_horsepower,at = list (id_year = 2010), data = gasoline_cars)
 ```
 
+Part(F) - Calculate $\hat{\beta}$ from d. manually (without using lm) by first creating a proper design matrix, then using matrix algebra to estimate $\beta$. Confirm that you get the same result as lm did prior.
+```{r}
+# using lm() to be compared to later for checking purposes
+model <- lm(fuel_highway_mpg ~ eng_torque*eng_horsepower + dim_length + dim_width + dim_height + as.factor(id_year), data = gasoline_cars)
 
+# estimating beta using matrix algebra
+X <- model.matrix(fuel_highway_mpg ~ eng_torque*eng_horsepower + dim_length + dim_width + dim_height + as.factor(id_year), data = gasoline_cars)
+y <- gasoline_cars$fuel_highway_mpg
+X_transpose <- t(X)
+X_transpose_X <- X_transpose %*% X
+X_transpose_X_inverse <- solve(X_transpose_X)
+X_transpose_y <- X_transpose %*% y
+beta_hat <- X_transpose_X_inverse %*% X_transpose_y
 
+beta_hat
+model
+```
+From the above results, I get the same results as lm().
