@@ -288,7 +288,7 @@ gasoline_cars <- cars_data[cars_data$fuel_type == "Gasoline", ]
 Part(C) - Examine the distribution of highway gas mileage. Consider whether a transformation could be used. If so, generate the transformed variable and use this variable going forward. If not, provide a short justification.
 ```{r}
 # highway gas mileage of 223 was removed (outlier)
- gasoline_cars <- gasoline_cars[gasoline_cars$fuel_highway_mpg < 50, ]
+gasoline_cars <- gasoline_cars[gasoline_cars$fuel_highway_mpg < 50, ]
 
 # showing outlier has been removed
 summary(gasoline_cars$fuel_highway_mpg)
@@ -311,7 +311,8 @@ Part(D) - Fit a linear regression model predicting MPG on the highway. The predi
 Briefly discuss the estimated relationship between torque and highway MPG. Be precise about the interpretation of the estimated coefficient.
 ```{r}
 # running linear regression model with predictor torque and controlling for the other variables
-model <- lm(fuel_highway_mpg ~ eng_torque + eng_horsepower + dim_length + dim_width + dim_height + as.factor(id_year), data = gasoline_cars)
+model <- lm(fuel_highway_mpg ~ eng_torque + eng_horsepower + dim_length + 
+              dim_width + dim_height + as.factor(id_year), data = gasoline_cars)
 
 # showing summary of the regression results
 summary(model)
@@ -325,22 +326,31 @@ library(interactions)
 library(emmeans)
 
 # lm() for generating interaction plot between torque and highway MPG, as horsepower changes
-model <- lm(fuel_highway_mpg ~ eng_torque*eng_horsepower + dim_length + dim_width + dim_height + as.factor(id_year), data = gasoline_cars)
+model <- lm(fuel_highway_mpg ~ eng_torque*eng_horsepower + dim_length + 
+              dim_width + dim_height + as.factor(id_year), data = gasoline_cars)
 
 # using emmip()
-emmip(model, eng_horsepower ~ eng_torque, at = list(eng_horsepower = c(150, 350, 550), eng_torque = c(150, 260, 420)))
+emmip(model, eng_horsepower ~ eng_torque, 
+      at = list(eng_horsepower = 
+                c(150, 350, 550), 
+                eng_torque = c(150, 260, 420)))
 
 # using interact_plot()
-interact_plot(model, pred = eng_torque, modx = eng_horsepower,at = list (id_year = 2010), data = gasoline_cars)
+interact_plot(model, pred = eng_torque, modx = eng_horsepower,
+              at = list (id_year = 2010), data = gasoline_cars)
 ```
 
 Part(F) - Calculate $\hat{\beta}$ from d. manually (without using lm) by first creating a proper design matrix, then using matrix algebra to estimate $\beta$. Confirm that you get the same result as lm did prior.
 ```{r}
 # using lm() to be compared to later for checking purposes
-model <- lm(fuel_highway_mpg ~ eng_torque*eng_horsepower + dim_length + dim_width + dim_height + as.factor(id_year), data = gasoline_cars)
+model <- lm(fuel_highway_mpg ~ eng_torque*eng_horsepower + dim_length + 
+              dim_width + dim_height + as.factor(id_year), data = gasoline_cars)
 
 # estimating beta using matrix algebra
-X <- model.matrix(fuel_highway_mpg ~ eng_torque*eng_horsepower + dim_length + dim_width + dim_height + as.factor(id_year), data = gasoline_cars)
+X <- model.matrix(fuel_highway_mpg ~ eng_torque*eng_horsepower + 
+                    dim_length + dim_width + dim_height + as.factor(id_year), 
+                    data = gasoline_cars)
+
 y <- gasoline_cars$fuel_highway_mpg
 X_transpose <- t(X)
 X_transpose_X <- X_transpose %*% X
