@@ -23,8 +23,31 @@ print(nrow(vision))
 
 Part (B) - Without fitting any models, estimate the proportion of respondents within each 10-year age bracket (e.g. 0-9, 10-19, 20-29, etc) who wear glasses/contact lenses for distance vision. Produce a nice table with the results.
 ```{r}
-#TODO
+
 ```
+
+
+
+Part(C) - Fit three logistic regression models predicting whether a respondent wears glasses/contact lenses for distance vision. Predictors:
+
+1. age
+2. age, race, gender
+3. age, race, gender, Poverty Income ratio
+
+Produce a table presenting the estimated odds ratios for the coefficients in each model, along with the sample size for the model, the pseudo-$R^2$, and AIC values.
+```{r}
+
+```
+
+
+
+
+Part(D) - From the third model from the previous part, test whether the odds of men and women being wears of glasess/contact lenses for distance vision differs. Test whether the proportion of wearers of glasses/contact lenses for distance vision differs between men and women. Include the results of the each test and their interpretation.
+```{r}
+
+```
+
+
 
 
 
@@ -96,7 +119,7 @@ columns <- dbListFields(sakila, "country")
 print(columns)
 
 dbGetQuery(sakila, "
- TODO
+
 ")
 ```
 Argentina and Nigeria have exactly 13 customers.
@@ -140,6 +163,8 @@ top_five <- sort(area_code_counts, decreasing = TRUE)[1:5]
 print(top_five)
 ```
 The top 5 most common area codes are "973", "212", "215", "410", and "201".
+
+
 
 
 Part(D) - Produce a histogram of the log of the apartment numbers for all addresses. (You may assume any number at the end of the an address is an apartment number.)
