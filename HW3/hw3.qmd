@@ -17,20 +17,25 @@ demo_d <- read_xpt("/Users/vincentweng/Documents/STATS-506/HW3/DEMO_D.XPT")
 
 vision <- merge(vix_d, demo_d, by = "SEQN", all = FALSE)
 
-print(nrow(vision))
+nrow(vision)
 ```
+The total sample size is now 6,980, as shown above.
 
 
 Part (B) - Without fitting any models, estimate the proportion of respondents within each 10-year age bracket (e.g. 0-9, 10-19, 20-29, etc) who wear glasses/contact lenses for distance vision. Produce a nice table with the results.
 ```{r}
-colnames(vision)[colnames(vision) == "VIQ200"] <- "glasses"
-colnames(vision)[colnames(vision) == "RIDAGEYR"] <- "age"
+library(knitr)
 
-# Viewing only the renamed columns
-vision_subset <- vision[, c("glasses", "age")]
+vision$glasses <- ifelse(vision$VIQ220 == 9, NA, vision$VIQ220 - 1)
+vision$age <- vision$RIDAGEYR
+vision$agecat <- floor(vision$age / 10)
 
-# Display the subset
-print(vision_subset)
+prop <- tapply(vision$glasses, vision$agecat, mean, na.rm = TRUE) * 100
+
+prop_df <- data.frame(AgeBracket = c("10-19", "20-29", "30-39", "40-49", 
+                                     "50-59", "60-69", "70-79", "80-89"),
+                                      Proportion = round(prop, 1))
+prop_df
 ```
 
 
@@ -43,7 +48,23 @@ Part(C) - Fit three logistic regression models predicting whether a respondent w
 
 Produce a table presenting the estimated odds ratios for the coefficients in each model, along with the sample size for the model, the pseudo-$R^2$, and AIC values.
 ```{r}
+vision$age <- vision$RIDAGEYR
+vision$gender <- vision$RIAGENDR
+vision$race <- vision$RIDRETH1
+vision$pov_inc_ratio <- vision$INDFMPIR
 
+# model 1: age as predictor
+model1 <- glm(glasses ~ age, data = vision, family = binomial)
+
+# model 2: age, race, gender as predictors
+model2 <- glm(glasses ~ age + race + gender, data = vision, family = binomial)
+
+# model 3: age, race, gender, and Poverty Income ratio as predictors
+model3 <- glm(glasses ~ age + race + gender + pov_inc_ratio, data = vision, family = binomial)
+
+summary(model1)
+summary(model2)
+summary(model3)
 ```
 
 
@@ -150,17 +171,19 @@ print(count/nrow(us_records))
 
 Part(B) - What proportion of email addresses have at least one non alphanumeric character in them? (Excluding the required “@” and “.” found in every email address.)
 ```{r}
-# remove "@" and "." from each email
-clean <- gsub("[@.]", "", us_records$email)
+# extract usernames and domains using regular expressions
+usernames <- sub("@.*", "", us_records$email)   # remove everything after '@' to get usernames
+domains <- sub(".*@", "", us_records$email)     # remove everything before '@' to get domains
+domains <- sub("\\.[a-z]{2,3}$", "", domains)   # remove the TLD (e.g., .com, .org)
 
-# check for non-alphanumeric characters
-non_alphanumeric <- grepl("[^a-zA-Z0-9]", clean)
+# check non-alphanumeric chars in usernames and domains
+username_non_alphanumeric <- grepl("[^a-zA-Z0-9]", usernames)
+domain_non_alphanumeric <- grepl("[^a-zA-Z0-9]", domains)
 
-# count emails with non-alphanumeric characters
-count <- sum(non_alphanumeric)
+# calculate proportion of emails with non-alphanumeric characters
+non_alphanumeric_proportion <- mean(username_non_alphanumeric | domain_non_alphanumeric)
 
-# prints out calculated proportion
-print(count/nrow(us_records))
+print(non_alphanumeric_proportion)
 ```
 
 
