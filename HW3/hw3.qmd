@@ -238,10 +238,12 @@ indices <- grep("[0-9]+$", us_records$address)
 apt <- us_records$address[indices]
 
 # split addresses by spaces and extract the last element (assumed to be a number)
-numbers <- sapply(strsplit(apt, " "), function(x) x[length(x)])
+nums <- sapply(strsplit(apt, " "), function(x) x[length(x)])
 
+# convert apt numbers to logarithmic 
 nums <- log(as.numeric(gsub("#", "", nums)))
 
+# produce histogram
 hist(nums)
 ```
 
@@ -268,5 +270,5 @@ comparison_df <- data.frame(
 print(comparison_df)
 ```
 
-From the above results, the observed distribution does not closely follow Benford's Law
+From the above results, the observed distribution does not closely follow Benford's Law and the data does not appear real.
 
