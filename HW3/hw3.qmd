@@ -62,9 +62,39 @@ model2 <- glm(glasses ~ age + race + gender, data = vision, family = binomial)
 # model 3: age, race, gender, and Poverty Income ratio as predictors
 model3 <- glm(glasses ~ age + race + gender + pov_inc_ratio, data = vision, family = binomial)
 
-summary(model1)
-summary(model2)
-summary(model3)
+
+#' Extract Model Information
+#' @description extracts necessary information from models produced above
+#' @param num_rolls: model
+extract_model_info <- function(model) {
+  odds_ratios <- exp(coef(model)) # calculate odds ratios
+  sample_size <- model$df.null + 1 # sample size
+  pseudo_r2 <- 1 - model$deviance / model$null.deviance # pseudo-R^2 
+  aic <- AIC(model) # aic value
+  
+  # create df with required information
+  data.frame(
+    Term = names(odds_ratios),
+    Odds_Ratio = odds_ratios,
+    Sample_Size = sample_size,
+    Pseudo_R2 = pseudo_r2,
+    AIC = aic
+  )
+}
+
+# get model info for each model
+model1_info <- extract_model_info(model1)
+model2_info <- extract_model_info(model2)
+model3_info <- extract_model_info(model3)
+
+# add model identifiers and combine results
+model_info_table <- rbind(
+  cbind(Model = "Model 1", model1_info),
+  cbind(Model = "Model 2", model2_info),
+  cbind(Model = "Model 3", model3_info)
+)
+
+print(model_info_table)
 ```
 
 
@@ -90,12 +120,6 @@ sakila <- dbConnect(RSQLite::SQLite(), "sakila_master.db")
 
 Part(A) - What is the oldest movie (earliest release year) in the database? Answer this with a single SQL query.
 ```{r}
-tables <- dbListTables(sakila)
-print(tables)
-
-columns <- dbListFields(sakila, "film")
-print(columns)
-
 dbGetQuery(sakila, "
   SELECT release_year, COUNT(title) AS movie_count
   FROM film
