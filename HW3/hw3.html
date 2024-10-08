@@ -3325,18 +3325,18 @@ pov_inc_ratio           0.07339952 7909.808</code></pre>
 <pre><code>p-value: 1.96446e-21 </code></pre>
 </div>
 </div>
-<p>The estimated odds ratio is 0.5967415 and the p-value is 1.96446e-21. This means that this is statistically significant in that the odds of men and women wearing glasses/contact lenses for distance vision do differ. Furthermore, the odds of women wearing glasses/contacts for distance vision is lower than the odds of men wearing glasses/contacts for distance vision, with statistical significance.</p>
+<p>The estimated odds ratio is roughly about 0.6 and the p-value is 1.96446e-21. This means that this is statistically significant in that the odds of men and women wearing glasses/contact lenses for distance vision do differ. Furthermore, the odds of women wearing glasses/contacts for distance vision is lower than the odds of men wearing glasses/contacts for distance vision, with statistical significance.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(margins)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute margins for &#39;female&#39; (gender) variable in model3</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate margins for &#39;female&#39; (gender) variable in model3</span></span>
 <span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>margins_female <span class="ot">&lt;-</span> <span class="fu">margins</span>(model3, <span class="at">variables =</span> <span class="st">&quot;gender&quot;</span>)</span>
 <span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(margins_female)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> factor     AME     SE       z      p   lower   upper
  gender -0.1139 0.0117 -9.7652 0.0000 -0.1368 -0.0911</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Pairwise comparison for predictive margins by gender</span></span>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pair-wise comparison for predictive margins by gender</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>margins_female_pw <span class="ot">&lt;-</span> <span class="fu">summary</span>(<span class="fu">margins</span>(model3, <span class="at">variables =</span> <span class="st">&quot;gender&quot;</span>, <span class="at">at =</span> <span class="fu">list</span>(<span class="at">gender =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)), <span class="at">pwcompare =</span> <span class="cn">TRUE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning in check_values(data, at): A &#39;at&#39; value for &#39;gender&#39; is outside
@@ -3349,7 +3349,7 @@ observed data range (1,2)!</code></pre>
  gender 1.0000 -0.1096 0.0108 -10.1684 0.0000 -0.1308 -0.0885</code></pre>
 </div>
 </div>
-<p>The above results show that women has a significantly lower probability of wearing glasses/contact lenses for distance vision (by about 10.96%) compared to men, with very strong statistical significance (p &lt; 0.0001).</p>
+<p>The above results show that women has a significantly lower probability of wearing glasses/contact lenses for distance vision with very strong statistical significance (p &lt; 0.0001).</p>
 <h3 class="anchored">
 Problem 2 - Sakila
 </h3>
@@ -3440,7 +3440,7 @@ column names &#39;last_update.x&#39;, &#39;last_update.y&#39; are duplicated in 
 Argentina   Nigeria 
        13        13 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># single SQL query</span></span>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># single SQL query to get country or countries with 13 customers</span></span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dbGetQuery</span>(sakila, <span class="st">&quot;</span></span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="st">  SELECT co.country, count(co.country)</span></span>
 <span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="st">  FROM country AS co</span></span>
@@ -3571,7 +3571,7 @@ Problem 3 - US Records
 9     9 0.10169492 0.04575749</code></pre>
 </div>
 </div>
-<p>From the above results, the observed distribution does not closely follow Benford’s Law and the data does not appear real.</p>
+<p>From the above results, the observed distribution does not closely follow Benford’s Law and the data does not appear real. Furthermore, it also appears to have a uniform distribution instead of the decreasing distribution in Benford’s law.</p>
 
 </main>
 <!-- /main column -->

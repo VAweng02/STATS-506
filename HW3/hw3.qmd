@@ -137,20 +137,20 @@ cat("Standard error:", se_gender, "\n")
 cat("z-value:", z_gender, "\n")
 cat("p-value:", p_value_gender, "\n")
 ```
-The estimated odds ratio is 0.5967415 and the p-value is 1.96446e-21. This means that this is statistically significant in that the odds of men and women wearing glasses/contact lenses for distance vision do differ. Furthermore, the odds of women wearing glasses/contacts for distance vision is lower than the odds of men wearing glasses/contacts for distance vision, with statistical significance. 
+The estimated odds ratio is roughly about 0.6 and the p-value is 1.96446e-21. This means that this is statistically significant in that the odds of men and women wearing glasses/contact lenses for distance vision do differ. Furthermore, the odds of women wearing glasses/contacts for distance vision is lower than the odds of men wearing glasses/contacts for distance vision, with statistical significance. 
 
 ```{r}
 library(margins)
 
-# Compute margins for 'female' (gender) variable in model3
+# calculate margins for 'female' (gender) variable in model3
 margins_female <- margins(model3, variables = "gender")
 summary(margins_female)
 
-# Pairwise comparison for predictive margins by gender
+# pair-wise comparison for predictive margins by gender
 margins_female_pw <- summary(margins(model3, variables = "gender", at = list(gender = c(0, 1)), pwcompare = TRUE))
 margins_female_pw
 ```
-The above results show that women has a significantly lower probability of wearing glasses/contact lenses for distance vision (by about 10.96%) compared to men, with very strong statistical significance (p < 0.0001).
+The above results show that women has a significantly lower probability of wearing glasses/contact lenses for distance vision with very strong statistical significance (p < 0.0001).
 
 
 
@@ -229,7 +229,7 @@ country_counts <- table(merged_data$country)
 # filter countries with 13 customers
 print(country_counts[country_counts == 13])
 
-# single SQL query
+# single SQL query to get country or countries with 13 customers
 dbGetQuery(sakila, "
   SELECT co.country, count(co.country)
   FROM country AS co
@@ -338,5 +338,5 @@ comparison_df <- data.frame(
 print(comparison_df)
 ```
 
-From the above results, the observed distribution does not closely follow Benford's Law and the data does not appear real.
+From the above results, the observed distribution does not closely follow Benford's Law and the data does not appear real. Furthermore, it also appears to have a uniform distribution instead of the decreasing distribution in Benford's law.
 
