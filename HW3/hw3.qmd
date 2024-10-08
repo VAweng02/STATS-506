@@ -12,26 +12,37 @@ Part (A) - Download the file VIX_D from this location, and determine how to read
 ```{r}
 library(haven)
 
+# read in VIX_D.XPT
 vix_d <- read_xpt("/Users/vincentweng/Documents/STATS-506/HW3/VIX_D.XPT")
+
+# read in DEMO_D.XPT
 demo_d <- read_xpt("/Users/vincentweng/Documents/STATS-506/HW3/DEMO_D.XPT")
 
+# merge the two datasets
 vision <- merge(vix_d, demo_d, by = "SEQN", all = FALSE)
 
-nrow(vision)
+nrow(vision) # total sample size
 ```
-The total sample size is now 6,980, as shown above.
+As shown above, the total sample size is now 6,980.
 
 
 Part (B) - Without fitting any models, estimate the proportion of respondents within each 10-year age bracket (e.g. 0-9, 10-19, 20-29, etc) who wear glasses/contact lenses for distance vision. Produce a nice table with the results.
 ```{r}
 library(knitr)
 
+# create 'glasses' column: NA if VIQ220 is 9, otherwise VIQ220 - 1
 vision$glasses <- ifelse(vision$VIQ220 == 9, NA, vision$VIQ220 - 1)
+
+# assign 'RIDAGEYR' to a new column 'age'
 vision$age <- vision$RIDAGEYR
+
+# create new column 'agecat' with age/10 and rounded down
 vision$agecat <- floor(vision$age / 10)
 
+# calculate mean of 'glasses' for each agecat and getting the proportion
 prop <- tapply(vision$glasses, vision$agecat, mean, na.rm = TRUE) * 100
 
+# create new df 'prop_df' with age brackets and their corresponding proportions
 prop_df <- data.frame(AgeBracket = c("10-19", "20-29", "30-39", "40-49", 
                                      "50-59", "60-69", "70-79", "80-89"),
                                       Proportion = round(prop, 1))
@@ -48,10 +59,19 @@ Part(C) - Fit three logistic regression models predicting whether a respondent w
 
 Produce a table presenting the estimated odds ratios for the coefficients in each model, along with the sample size for the model, the pseudo-$R^2$, and AIC values.
 ```{r}
-vision$age <- vision$RIDAGEYR
-vision$gender <- vision$RIAGENDR
-vision$race <- vision$RIDRETH1
-vision$pov_inc_ratio <- vision$INDFMPIR
+vision$age <- vision$RIDAGEYR  # assign 'RIDAGEYR' to 'age'
+vision$gender <- vision$RIAGENDR  # assign 'RIAGENDR' to 'gender'
+vision$race <- vision$RIDRETH1  # assign 'RIDRETH1' to 'race'
+vision$pov_inc_ratio <- vision$INDFMPIR  # assign 'INDFMPIR' to 'pov_inc_ratio'
+
+vision$female <- ifelse(vision$gender == 2, 1, 0) # binary female variable
+vision$female[is.na(vision$female)] <- NA  # set missing values to NA
+
+# convert race to a factor with specific labels for each level
+vision$race <- factor(vision$race, levels = 1:5, 
+                      labels = c("Mexican American", "Other Hispanic", 
+                                 "Non-Hispanic White", "Non-Hispanic Black", 
+                                 "Multi-racial"))
 
 # model 1: age as predictor
 model1 <- glm(glasses ~ age, data = vision, family = binomial)
@@ -74,10 +94,10 @@ extract_model_info <- function(model) {
   
   # create df with required information
   data.frame(
-    Term = names(odds_ratios),
-    Odds_Ratio = odds_ratios,
-    Sample_Size = sample_size,
-    Pseudo_R2 = pseudo_r2,
+    term = names(odds_ratios),
+    odds_Ratio = odds_ratios,
+    sample_Size = sample_size,
+    pseudo_R2 = pseudo_r2,
     AIC = aic
   )
 }
@@ -96,16 +116,41 @@ model_info_table <- rbind(
 
 print(model_info_table)
 ```
+The table is shown above. Furthermore, NAs were not removed, because in logistic regression models (glm), rows with NA in any predictor are automatically excluded from model fitting by default. Thus, we can keep the data clean while ensuring missing values don't affect the model fitting process.
 
 
 
-
-Part(D) - From the third model from the previous part, test whether the odds of men and women being wears of glasess/contact lenses for distance vision differs. Test whether the proportion of wearers of glasses/contact lenses for distance vision differs between men and women. Include the results of the each test and their interpretation.
+Part(D) - From the third model from the previous part, test whether the odds of men and women being wears of glasses/contact lenses for distance vision differs. Test whether the proportion of wearers of glasses/contact lenses for distance vision differs between men and women. Include the results of the each test and their interpretation.
 ```{r}
+summary_model3 <- summary(model3)
 
+# Extract gender results
+gender_results <- summary_model3$coefficients["gender", ]  # Get gender row
+odds_ratio_gender <- exp(gender_results["Estimate"])  # Calculate odds ratio
+se_gender <- gender_results["Std. Error"]  # Get standard error
+z_gender <- gender_results["z value"]  # Get z-value
+p_value_gender <- gender_results["Pr(>|z|)"]  # Get p-value
+
+# print results
+cat("Odds ratio for gender (female vs male):", odds_ratio_gender, "\n")
+cat("Standard error:", se_gender, "\n")
+cat("z-value:", z_gender, "\n")
+cat("p-value:", p_value_gender, "\n")
 ```
+The estimated odds ratio is 0.5967415 and the p-value is 1.96446e-21. This means that this is statistically significant in that the odds of men and women wearing glasses/contact lenses for distance vision do differ. Furthermore, the odds of women wearing glasses/contacts for distance vision is lower than the odds of men wearing glasses/contacts for distance vision, with statistical significance. 
 
+```{r}
+library(margins)
 
+# Compute margins for 'female' (gender) variable in model3
+margins_female <- margins(model3, variables = "gender")
+summary(margins_female)
+
+# Pairwise comparison for predictive margins by gender
+margins_female_pw <- summary(margins(model3, variables = "gender", at = list(gender = c(0, 1)), pwcompare = TRUE))
+margins_female_pw
+```
+The above results show that women has a significantly lower probability of wearing glasses/contact lenses for distance vision (by about 10.96%) compared to men, with very strong statistical significance (p < 0.0001).
 
 
 
@@ -120,6 +165,7 @@ sakila <- dbConnect(RSQLite::SQLite(), "sakila_master.db")
 
 Part(A) - What is the oldest movie (earliest release year) in the database? Answer this with a single SQL query.
 ```{r}
+# single SQL query to get oldest movie year and number of movies in that year
 dbGetQuery(sakila, "
   SELECT release_year, COUNT(title) AS movie_count
   FROM film
@@ -134,24 +180,23 @@ dbGetQuery(sakila, "
 
 Part(B) - What genre of movie is the least common in the data, and how many movies are of this genre?
 ```{r}
-# load tables into R data.frame
-category <- dbReadTable(sakila, "category")
-film_category <- dbReadTable(sakila, "film_category")
+# query to get merged table of category and film_category
+category_movie_counts <- dbGetQuery(sakila, "
+  SELECT category.name, COUNT(film_category.film_id) AS movie_count
+  FROM category
+  JOIN film_category ON category.category_id = film_category.category_id
+  GROUP BY category.name
+")
 
-# merge the two df based on category_id
-merged_data <- merge(category, film_category, by = "category_id")
+# find category with the minimum count
+min_count_category <- category_movie_counts$name[which.min(category_movie_counts$movie_count)]
+min_count <- min(category_movie_counts$movie_count)
 
-# count movies in each category
-movie_counts <- table(merged_data$name)
-
-# find category with the min count
-min_count_category <- names(movie_counts)[which.min(movie_counts)]
-min_count <- min(movie_counts)
-
+# print out results
 cat("Category with least movies:", min_count_category, "\n")
 cat("Number of movies in this category:", min_count, "\n")
 
-# single SQL query
+# single SQL query to get least common movie genre
 dbGetQuery(sakila, "
   SELECT c.name, COUNT(c.category_id)
   FROM category AS c
@@ -161,17 +206,17 @@ dbGetQuery(sakila, "
   LIMIT 1
 ")
 ```
-The lease common genrie in the data is Music and there are 51 movies in this genre.
+The least common genre in the data is Music and there are 51 movies in this genre.
 
 
 
 Part(C) - Identify which country or countries have exactly 13 customers.
 ```{r}
-# load tables into R data.frame
-country <- dbReadTable(sakila, "country")
-city <- dbReadTable(sakila, "city")
-address <- dbReadTable(sakila, "address")
-customer <- dbReadTable(sakila, "customer")
+# load each table into R df using SQL queries
+country <- dbGetQuery(sakila, "SELECT * FROM country")
+city <- dbGetQuery(sakila, "SELECT * FROM city")
+address <- dbGetQuery(sakila, "SELECT * FROM address")
+customer <- dbGetQuery(sakila, "SELECT * FROM customer")
 
 # joining tables together
 merged_data <- merge(country, city, by.x = "country_id", by.y = "country_id")
@@ -199,8 +244,6 @@ Argentina and Nigeria have exactly 13 customers.
 
 
 
-
-
 <h3>Problem 3 - US Records</h3>
 
 Part(A) - What proportion of email addresses are hosted at a domain with TLD “.com”? (in the email, “angrycat@freemail.org”, “freemail.org” is the domain, and “.org” is the TLD (top-level domain).)
@@ -214,6 +257,7 @@ count <- sum(grepl("\\.com$", us_records$email))
 # dividing the above count by total to get proportion
 print(count/nrow(us_records))
 ```
+From the above, 73.2% of email addresses are hosted at a domain with TLD “.com”.
 
 
 Part(B) - What proportion of email addresses have at least one non alphanumeric character in them? (Excluding the required “@” and “.” found in every email address.)
