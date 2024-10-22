@@ -1,0 +1,136 @@
+---
+title: "STATS 506 - Homework 4"
+author: "Vincent Weng"
+format:
+  html:
+    embed-resources: true
+---
+
+<h3>Problem 1 - Tidyverse</h3>
+
+Use the tidyverse for this problem. In particular, use piping and dplyr as much as you are able. Note: Use of any deprecated functions will result in a point loss.
+
+Install and load the package nycflights13.
+
+```{r}
+library(tidyverse) # using tidyverse
+```
+
+Part (A) - Generate a table (which can just be a nicely printed tibble) reporting the mean and median departure delay per airport. Generate a second table (which again can be a nicely printed tibble) reporting the mean and median arrival delay per airport. Exclude any destination with under 10 flights. Do this exclusion through code, not manually.
+
+Additionally,
+
+Order both tables in descending mean delay.
+Both tables should use the airport names not the airport codes.
+Both tables should print all rows.
+```{r}
+library(nycflights13)
+
+flights %>%
+  group_by(origin) %>%
+  summarize(mean_delay = mean(dep_delay, na.rm = TRUE),
+            median_delay = median(dep_delay, na.rm = TRUE),
+            total_flights = n()) %>%
+  ungroup() %>%
+  filter(total_flights > 10) %>%
+  rename(faa = origin) %>%
+  left_join(airports, by = "faa") %>%
+  select(name, mean_delay, median_delay) %>%
+  arrange(desc(mean_delay))
+```
+
+
+Part (B) - How many flights did the aircraft model with the fastest average speed take? Produce a tibble with 1 row, and entires for the model, average speed (in MPH) and number of flights.
+```{r}
+```
+
+
+
+
+
+<h3>Problem 2 - get_temp()</h3>
+```{r}
+
+get_temp <- function(month, year, data, celsius = FALSE, average_fn = mean) {
+
+  if (month %>% is.numeric()) {
+    # if month is numeric, check if it's between 1 and 12
+    if (month < 1 || month > 12) {
+      stop("Invalid month: Numeric months must be between 1 and 12")
+    }
+  } else if (month %>% is.character()) {
+    # if month is a string, check if the string is a valid month name or abbreviation
+    valid_months <- c("January", "February", "March", "April", "May", "June", 
+                      "July", "August", "September", "October", "November", "December")
+    
+    # Attempt to match month to a valid full month or abbreviation
+    month <- match.arg(month, valid_months, several.ok = TRUE)
+    
+  } else {
+    stop("Invalid month: Must be either numeric or a string")
+  }
+
+  
+  # check if year is numeric
+  if (!year %>% is.numeric) {
+    stop("Invaild year: Must be numeric")
+  }
+  
+  # check if average_fn if a function
+  if (!(average_fn %>% is.function)) {
+    stop("Invalid average_fn: Must be a function")
+  }
+  
+  data %>%
+    select(temp, month_numeric, year) %>%
+    rename(year_col = year) %>%
+    filter(year_col == year, month_numeric == month) %>%
+    summarize(average_temp = average_fn(temp)) %>%
+    mutate(
+    avg_temp_celsius = (average_temp - 32) * 5/9,
+    final_avg_temp = if (isTRUE(celsius)) {
+      avg_temp_celsius
+    } else {
+      average_temp
+    }
+  ) %>%
+    as.numeric -> result
+  
+  return(result)
+}
+
+nnmaps <- read_csv("chicago-nmmaps.csv")
+```
+
+```{r}
+get_temp("Apr", 1999, data = nnmaps)
+```
+
+```{r}
+get_temp("Apr", 1999, data = nnmaps, celsius = TRUE)
+```
+
+```{r}
+get_temp(10, 1998, data = nnmaps, average_fn = median)
+```
+
+```{r}
+get_temp(13, 1998, data = nnmaps)
+```
+
+```{r}
+get_temp(2, 2005, data = nnmaps)
+```
+
+```{r}
+get_temp("November", 1999, data =nnmaps, celsius = TRUE,
+         average_fn = function(x) {
+           x %>% sort -> x
+           x[2:(length(x) - 1)] %>% mean %>% return
+         })
+```
+
+
+
+
+
