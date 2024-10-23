@@ -26,6 +26,7 @@ Both tables should print all rows.
 ```{r}
 library(nycflights13)
 
+# tidverse pipeline for departure
 flights %>%
   group_by(origin) %>%
   summarize(mean_delay = mean(dep_delay, na.rm = TRUE),
@@ -37,11 +38,23 @@ flights %>%
   left_join(airports, by = "faa") %>%
   select(name, mean_delay, median_delay) %>%
   arrange(desc(mean_delay))
+
+# tidverse pipeline for arrival
+# TODO
 ```
 
 
-Part (B) - How many flights did the aircraft model with the fastest average speed take? Produce a tibble with 1 row, and entires for the model, average speed (in MPH) and number of flights.
+Part (B) - How many flights did the aircraft model with the fastest average speed take? Produce a tibble with 1 row, and entries for the model, average speed (in MPH) and number of flights.
 ```{r}
+flights %>%
+  left_join(planes, by="tailnum") %>%
+  # calculate mph (distance per hour of flight)
+  mutate(mph = distance / (air_time / 60)) %>%
+  group_by(model) %>%
+  # calculate average mph and total number of flights
+  summarize(avg_mph = mean(mph, na.rm = TRUE), num_flights = n()) %>%
+  arrange(desc(avg_mph)) %>%
+  slice(1)
 ```
 
 
@@ -179,7 +192,7 @@ ggplot(average_price_by_year, aes(x = year, y = avg_price)) +
     axis.text = element_text(size = 12)  # adjust axis text size
   )
 ```
-As shown above, there is a change in the sales price in USD over time.
+As shown above, there is a change in the sales price in USD over time. The average price increases steadily until 2004, surges sharply between 2005 and 2008, and then drops significantly after 2008. This is then followed by fluctuations that indicate stabilization at a higher price range compared to before 2004.
 
 
 Part (B) - Does the distribution of genre of sales across years appear to change?
@@ -205,7 +218,7 @@ ggplot(df_long, aes(x = year, fill = genre)) +
     axis.text = element_text(size = 12)
   )
 ```
-As shown above, the distribution of genre of sales across years does appear to change.
+As shown above, the distribution of genre of sales across years does appear to change. 
 
 
 
