@@ -131,6 +131,84 @@ get_temp("November", 1999, data =nnmaps, celsius = TRUE,
 ```
 
 
+<h3>Problem 3 - Visualization</h3>
 
+Note: This is, intentionally, a very open-ended question. There is no “right” answer. The goal is for you to explore your plotting options, and settle on something reasonable. You can use base R, ggplot, or something else. You’ll likely have to look online for resources on plotting beyond what we covered in class.
+
+This dataset lists characteristics of art sales. Download the file named “df_for_ml_improved_new_market” (NOT the “df_for_ml_improved_new_market_1” version!). For each of the following, produce a publication-ready plot which demonstrates the answer to the question. Use your plot to support an argument for your question.
+
+Part (A) - Is there a change in the sales price in USD over time?
+```{r}
+library(ggplot2)
+df <- read.csv("df_for_ml_improved_new_market.csv")
+
+# calculate the average price_usd for each year
+average_price_by_year <- df %>%
+  group_by(year) %>%
+  summarize(avg_price = mean(price_usd, na.rm = TRUE))
+
+# plot the average price_usd over time
+ggplot(average_price_by_year, aes(x = year, y = avg_price)) +
+  geom_line(size = 1.2, color = "blue") + # thicker line and custom color
+  geom_point(size = 3, color = "red", shape = 21, fill = "white") +  # larger points with a custom fill
+  labs(title = "Average Sales Price Over Time", 
+       x = "Year", 
+       y = "Average Sales Price (USD)") +
+  theme_minimal() + #. cleaner minimal theme
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16),  # center title and adjust font size
+    axis.title.x = element_text(size = 14),
+    axis.title.y = element_text(size = 14),
+    axis.text = element_text(size = 12)  # adjust axis text size
+  )
+```
+As shown above, there is a change in the sales price in USD over time.
+
+
+Part (B) - Does the distribution of genre of sales across years appear to change?
+```{r}
+df_long <- df %>%
+  pivot_longer(cols = starts_with("Genre___"), 
+               names_to = "genre", 
+               values_to = "count") %>%
+  filter(count == 1)  # assuming binary encoding (1 if sale in that genre, else 0)
+
+# create stacked bar chart
+ggplot(df_long, aes(x = year, fill = genre)) +
+  geom_bar(position = "fill") +  # position fill for proportion stacking
+  labs(title = "Distribution of Genre of Sales Across Years",
+       x = "Year",
+       y = "Proportion of Sales") +
+  scale_fill_brewer(palette = "Set3") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16),
+    axis.title.x = element_text(size = 14),
+    axis.title.y = element_text(size = 14),
+    axis.text = element_text(size = 12)
+  )
+```
+As shown above, the distribution of genre of sales across years does appear to change.
+
+
+
+Part (C) - How does the genre affect the change in sales price over time?
+```{r}
+df_long_genre_price <- df %>%
+  pivot_longer(cols = starts_with("Genre___"), 
+               names_to = "genre", 
+               values_to = "count") %>%
+  filter(count == 1) %>%
+  group_by(year, genre) %>%
+  summarize(avg_price = mean(price_usd, na.rm = TRUE)) %>%
+  ungroup()
+
+ggplot(df_long_genre_price, aes(x = year, y = avg_price, color = genre)) +
+  geom_line() +
+  labs(title = "Average Sales Price by Genre Over Time",
+       x = "Year",
+       y = "Average Price (USD)") +
+  theme_minimal()
+```
 
 
