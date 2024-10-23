@@ -53,51 +53,60 @@ Part (B) - How many flights did the aircraft model with the fastest average spee
 
 get_temp <- function(month, year, data, celsius = FALSE, average_fn = mean) {
 
-  if (month %>% is.numeric()) {
-    # if month is numeric, check if it's between 1 and 12
+  # check numeric and string months
+  if (is.numeric(month)) {
+    # check month is valid
     if (month < 1 || month > 12) {
       stop("Invalid month: Numeric months must be between 1 and 12")
     }
-  } else if (month %>% is.character()) {
-    # if month is a string, check if the string is a valid month name or abbreviation
+  } else if (is.character(month)) {
+    # check string is valid month or abbrev
     valid_months <- c("January", "February", "March", "April", "May", "June", 
                       "July", "August", "September", "October", "November", "December")
-    
-    # Attempt to match month to a valid full month or abbreviation
-    month <- match.arg(month, valid_months, several.ok = TRUE)
-    
+    abbrev_months <- substr(valid_months, 1, 3)  # get abbrev
+
+    if (month %in% abbrev_months) {
+      # if month is abbrev, find full month name
+      month <- valid_months[which(abbrev_months == month)]
+    } else if (!(month %in% valid_months)) {
+      stop("Invalid month: Must be a valid month name or abbreviation")
+    }
+
+    # convert month to numeric
+    month <- match(month, valid_months)
   } else {
     stop("Invalid month: Must be either numeric or a string")
   }
 
-  
-  # check if year is numeric
-  if (!year %>% is.numeric) {
-    stop("Invaild year: Must be numeric")
+  # check year is numeric
+  if (!is.numeric(year)) {
+    stop("Invalid year: Must be numeric")
   }
-  
-  # check if average_fn if a function
-  if (!(average_fn %>% is.function)) {
+
+  if (year > 2000 || year < 1997) {
+    stop("Invalid year: Year is out of range")
+  }
+
+  # check average_fn is a function
+  if (!is.function(average_fn)) {
     stop("Invalid average_fn: Must be a function")
   }
-  
-  data %>%
+
+  # filter data and calculate the temp
+  result <- data %>%
     select(temp, month_numeric, year) %>%
     rename(year_col = year) %>%
     filter(year_col == year, month_numeric == month) %>%
     summarize(average_temp = average_fn(temp)) %>%
     mutate(
-    avg_temp_celsius = (average_temp - 32) * 5/9,
-    final_avg_temp = if (isTRUE(celsius)) {
-      avg_temp_celsius
-    } else {
-      average_temp
-    }
-  ) %>%
-    as.numeric -> result
-  
+      avg_temp_celsius = (average_temp - 32) * 5 / 9,
+      final_avg_temp = if (isTRUE(celsius)) avg_temp_celsius else average_temp
+    ) %>%
+    pull(final_avg_temp)  # pull result as a numeric value
+
   return(result)
 }
+
 
 nnmaps <- read_csv("chicago-nmmaps.csv")
 ```
@@ -115,11 +124,19 @@ get_temp(10, 1998, data = nnmaps, average_fn = median)
 ```
 
 ```{r}
-get_temp(13, 1998, data = nnmaps)
+tryCatch({
+  get_temp(13, 1998, data = nnmaps)
+}, error = function(e) {
+  cat("Error: ", e$message, "\n")
+})
 ```
 
 ```{r}
-get_temp(2, 2005, data = nnmaps)
+tryCatch({
+  get_temp(2, 2005, data = nnmaps)
+}, error = function(e) {
+  cat("Error: ", e$message, "\n")
+})
 ```
 
 ```{r}
