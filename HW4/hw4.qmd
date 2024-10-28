@@ -26,21 +26,31 @@ Both tables should print all rows.
 ```{r}
 library(nycflights13)
 
-# tidverse pipeline for departure
+# tidyverse pipeline for departure
 flights %>%
   group_by(origin) %>%
   summarize(mean_delay = mean(dep_delay, na.rm = TRUE),
             median_delay = median(dep_delay, na.rm = TRUE),
             total_flights = n()) %>%
   ungroup() %>%
-  filter(total_flights > 10) %>%
+  filter(total_flights >= 10) %>%
   rename(faa = origin) %>%
   left_join(airports, by = "faa") %>%
   select(name, mean_delay, median_delay) %>%
   arrange(desc(mean_delay))
 
 # tidverse pipeline for arrival
-# TODO
+flights %>%
+  group_by(dest) %>%
+  summarize(mean_delay = mean(arr_delay, na.rm = TRUE),
+            median_delay = median(arr_delay, na.rm = TRUE),
+            total_flights = n()) %>%
+  ungroup() %>%
+  filter(total_flights >= 10) %>%
+  rename(faa = dest) %>%
+  left_join(airports, by = "faa") %>%
+  select(name, mean_delay, median_delay) %>%
+  arrange(desc(mean_delay))
 ```
 
 
