@@ -39,7 +39,7 @@ flights %>%
   select(name, mean_delay, median_delay) %>%
   arrange(desc(mean_delay))
 
-# tidverse pipeline for arrival
+# tidyverse pipeline for arrival
 flights %>%
   group_by(dest) %>%
   summarize(mean_delay = mean(arr_delay, na.rm = TRUE),
@@ -50,7 +50,8 @@ flights %>%
   rename(faa = dest) %>%
   left_join(airports, by = "faa") %>%
   select(name, mean_delay, median_delay) %>%
-  arrange(desc(mean_delay))
+  arrange(desc(mean_delay)) %>%
+  print(n=count(.))
 ```
 
 
@@ -228,27 +229,38 @@ ggplot(df_long, aes(x = year, fill = genre)) +
     axis.text = element_text(size = 12)
   )
 ```
-As shown above, the distribution of genre of sales across years does appear to change. 
+As shown above, the distribution of genre sales across years does appear to change. Photography starts with a large share but gradually decreases over time, while Print shows a clear increase in proportion from 2000 onwards. Sculpture remains relatively stable, consistently holding a significant share. Painting decreases around 2000 and stays low, and Others maintains a small, steady presence.
 
 
 
 Part (C) - How does the genre affect the change in sales price over time?
 ```{r}
 df_long_genre_price <- df %>%
-  pivot_longer(cols = starts_with("Genre___"), 
-               names_to = "genre", 
-               values_to = "count") %>%
-  filter(count == 1) %>%
+  pivot_longer(
+    cols = starts_with("Genre___"),  # select columns starting with "Genre___"
+    names_to = "genre",              # create new column named "genre"
+    values_to = "count"              # store orig val in new column "count"
+  ) %>%
+  
+  filter(count == 1) %>% # filter where count is 1 (presence of that genre)
+  
+  # group the data by year and genre to calculate average price in each group
   group_by(year, genre) %>%
-  summarize(avg_price = mean(price_usd, na.rm = TRUE)) %>%
-  ungroup()
+  summarize(
+    avg_price = mean(price_usd, na.rm = TRUE)  # calculate average prices
+  ) %>%
+  
+  ungroup() # remove the grouping to return to a regular df 
 
+# create line plot to visualize average price over time
 ggplot(df_long_genre_price, aes(x = year, y = avg_price, color = genre)) +
-  geom_line() +
-  labs(title = "Average Sales Price by Genre Over Time",
-       x = "Year",
-       y = "Average Price (USD)") +
-  theme_minimal()
+  geom_line() +  # Plot lines for each genre showing avg_price over time
+  labs(
+    title = "Average Sales Price by Genre Over Time",  
+    x = "Year",                                        
+    y = "Average Price (USD)"                          
+  ) +
+  theme_minimal()  # apply a minimal theme
 ```
-
+The above shows that Photography and Print experienced sharp price spikes around 2007-2008, reaching high average prices before a significant decline, indicating a period of heightened demand or market interest. Other genres, such as Painting, Sculpture, and Others, had lower and more stable average prices over time. By 2012, prices across all genres appear to stabilize, suggesting a normalization or market correction after the volatile period. This highlights the price volatility in certain genres and the impact of genre types on the change in sales price over time.
 
