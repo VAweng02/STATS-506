@@ -74,7 +74,13 @@ flights %>%
 
 <h3>Problem 2 - get_temp()</h3>
 ```{r}
-
+#' Computes monthly average temperature
+#' @param month Integer or string. Month as a number (1-12), name, or abbrev.
+#' @param year Integer. Year (between 1997 and 2000).
+#' @param data Data frame with columns temp, month_numeric, and year.
+#' @param celsius Logical. Default is 'FALSE'.
+#' @param average_fn Function for average temp. Default is 'mean'.
+#' @return Numeric. Average temperature.
 get_temp <- function(month, year, data, celsius = FALSE, average_fn = mean) {
 
   # check numeric and string months
