@@ -1,0 +1,348 @@
+---
+title: "STATS 506 - Homework 5"
+author: "Vincent Weng"
+format:
+  html:
+    embed-resources: true
+---
+
+<h3>Problem 1 - OOP Programming</h3>
+
+Part (A) - For the rational class, define the following:
+
+1. A constructor
+2. A validator that ensures the denominator is non-zero.
+3. A show method.
+4. A simplify method, to obtain the simplest form (e.g. simplify(2/4) produces 1/2).
+5. A quotient method (e.g. quotient(3/7) produces .42857143...). It should support a digits argument but only in the printing, not the returned result (Hint: what does print return?).
+6. Addition, subtraction, multiplication, division. These should all return a rational.
+7. You’ll (probably) need GCD and LCM as part of some of these calculations; include these functions using Rcpp. Even if you don’t need these functions for another calculation, include them.
+
+```{r}
+##' @title GCD Function
+##' @param a and b
+##' @return gcd output
+gcd <- function(a, b) {
+  while (b != 0) {
+    t <- b
+    b <- a %% b
+    a <- t
+  }
+  abs(a)
+}
+
+# define rational S4 class
+setClass("Rational",
+         slots = list(numerator = "integer", denominator = "integer"),
+         validity = function(object) {
+           # check if denominator is zero
+           if (object@denominator == 0) {
+             stop("Denominator cannot be zero.")
+           }
+           # ensure both numerator and denominator are int
+           if (!is.integer(object@numerator) || !is.integer(object@denominator)) {
+             stop("Both numerator and denominator must be integers.")
+           }
+           TRUE
+         })
+
+# constructor function with validation
+Rational <- function(numerator, denominator) {
+  # ensure numerator and denominator are numeric and convert to int
+  if (!is.numeric(numerator) || !is.numeric(denominator)) {
+    stop("Both numerator and denominator must be numeric values.")
+  }
+  if (denominator == 0) {
+    stop("Denominator cannot be zero.")
+  }
+  
+  # convert to int
+  numerator <- as.integer(numerator)
+  denominator <- as.integer(denominator)
+  
+  # create new Rational object
+  new("Rational", numerator = numerator, denominator = denominator)
+}
+
+# show method
+setMethod("show", "Rational", function(object) {
+  cat(object@numerator, "/", object@denominator, "\n")
+})
+
+# simplify method
+setGeneric("simplify", function(object) standardGeneric("simplify"))
+setMethod("simplify", "Rational", function(object) {
+  gcd_val <- gcd(object@numerator, object@denominator)
+  object@numerator <- as.integer(object@numerator / gcd_val)
+  object@denominator <- as.integer(object@denominator / gcd_val)
+  object
+})
+
+# quotient method with digits argument
+setGeneric("quotient", function(object, digits = 6) standardGeneric("quotient"))
+setMethod("quotient", "Rational", function(object, digits = 6) {
+  round(as.numeric(object@numerator) / as.numeric(object@denominator), digits)
+})
+
+# arithmetic operations
+setMethod("+", c("Rational", "Rational"), function(e1, e2) {
+  denom <- as.integer(e1@denominator * e2@denominator)
+  numer <- as.integer(e1@numerator * e2@denominator + e2@numerator * e1@denominator)
+  simplify(Rational(numer, denom))
+})
+
+setMethod("-", c("Rational", "Rational"), function(e1, e2) {
+  denom <- as.integer(e1@denominator * e2@denominator)
+  numer <- as.integer(e1@numerator * e2@denominator - e2@numerator * e1@denominator)
+  simplify(Rational(numer, denom))
+})
+
+setMethod("*", c("Rational", "Rational"), function(e1, e2) {
+  simplify(Rational(as.integer(e1@numerator * e2@numerator), as.integer(e1@denominator * e2@denominator)))
+})
+
+setMethod("/", c("Rational", "Rational"), function(e1, e2) {
+  if (e2@numerator == 0) stop("Division by zero.")
+  simplify(Rational(as.integer(e1@numerator * e2@denominator), as.integer(e1@denominator * e2@numerator)))
+})
+```
+
+
+Part (B) - Use your rational class to create three objects:
+
+r1: 24/6
+r2: 7/230
+r3: 0/40
+
+```{r}
+# List of expressions to evaluate with tryCatch
+expressions <- list(
+  quote(r1),
+  quote(r3),
+  quote(r1 + r2),
+  quote(r1 - r2),
+  quote(r1 * r2),
+  quote(r1 / r2),
+  quote(r1 + r3),
+  quote(r1 * r3),
+  quote(r2 / r3),
+  quote(quotient(r1)),
+  quote(quotient(r2)),
+  quote(quotient(r2, digits = 3)),
+  quote(quotient(r2, digits = 3.14)),
+  quote(quotient(r2, digits = "avocado")),
+  quote(q2 <- quotient(r2, digits = 3)),
+  quote(q2),
+  quote(quotient(r3)),
+  quote(simplify(r1)),
+  quote(simplify(r2)),
+  quote(simplify(r3))
+)
+
+# Loop through each expression and evaluate with tryCatch
+for (expr in expressions) {
+  tryCatch({
+    result <- eval(expr) # Evaluate the expression
+    print(result)        # Print the result if successful
+  }, error = function(e) {
+    cat("Error:", e$message, "\n") # Print error message if there's an error
+  })
+}
+
+```
+
+Part(C) - Show that your validator does not allow the creation of rational’s with 0 denominator, and check other malformed input to your constructor.
+```{r error=true}
+# valid example: should succeed and simplify to 4/1
+tryCatch({
+  r1 <- Rational(24, 6)
+  print(r1)
+}, error = function(e) {
+  cat("Error:", e$message, "\n")
+})
+
+# invalid example: denominator is zero
+tryCatch({
+  r2 <- Rational(3, 0)
+  print(r2)
+}, error = function(e) {
+  cat("Error:", e$message, "\n") # expected message: "Denominator cannot be zero."
+})
+
+# invalid example: non-numeric input
+tryCatch({
+  r3 <- Rational("a", 4)
+  print(r3)
+}, error = function(e) {
+  cat("Error:", e$message, "\n") # expected message: "Both numerator and denominator must be numeric values."
+})
+
+# invalid example: non-integer numeric input (will convert to integer if handled in Rational)
+tryCatch({
+  r4 <- Rational(3.5, 2.5)
+  print(r4)
+}, error = function(e) {
+  cat("Error:", e$message, "\n")
+})
+
+```
+As shown above, the validator does not allow the creation of rationals with 0 denominator. Furthermore, it also checks that numerator and denominator are numeric inputs. Finally, it also checks that if inputs are convertible to numeric and converts it make a rational number.
+
+
+
+<h3>Problem 2 - plotly</h3>
+
+Let’s revisit the art data from the last problem set. Use plotly for these.
+
+Part (A) - Regenerate your plot which addresses the second question from last time:
+```{r}
+library(dplyr)
+library(tidyr)
+library(plotly)
+
+# read in data
+df <- read.csv("df_for_ml_improved_new_market.csv")
+
+# tidyverse pipeline
+df_long <- df %>%
+  pivot_longer(cols = starts_with("Genre___"), 
+               names_to = "genre", 
+               values_to = "count") %>%
+  filter(count == 1) %>%
+  group_by(year, genre) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  group_by(year) %>%
+  mutate(proportion = count / sum(count))
+
+# create stacked bar chart using plotly
+plot <- plot_ly(df_long, x = ~year, y = ~proportion, type = 'bar', 
+                color = ~genre, colors = 'Set3') %>%
+  layout(barmode = 'stack',
+         title = list(text = "Distribution of Genre of Sales Across Years", x = 0.5),
+         xaxis = list(title = "Year", titlefont = list(size = 14), tickfont = list(size = 12)),
+         yaxis = list(title = "Proportion of Sales", titlefont = list(size = 14), tickfont = list(size = 12)))
+
+plot
+```
+
+
+
+Part (B) - Generate an interactive plot with plotly that can address both of these questions from last time.
+
+This should be a single interactive plot, with which a user can manipulate the view to be able to look at change over time overall, or by genre.
+```{r}
+library(dplyr)
+library(plotly)
+library(tidyr)
+
+# Calculate the average price_usd for each year
+average_price_by_year <- df %>%
+  group_by(year) %>%
+  summarize(avg_price = mean(price_usd, na.rm = TRUE))
+
+# Plot 1: Average Sales Price Over Time
+plot1 <- plot_ly(
+  average_price_by_year, 
+  x = ~year, 
+  y = ~avg_price, 
+  type = 'scatter', 
+  mode = 'lines+markers',
+  line = list(color = 'blue', width = 1.2),
+  marker = list(color = 'red', size = 6, line = list(width = 1, color = 'white')),
+  name = "Average Price Over Time",
+  visible = TRUE  # Set this to visible by default
+)
+
+# Reshape and summarize data
+df_long_genre_price <- df %>%
+  pivot_longer(
+    cols = starts_with("Genre___"),  
+    names_to = "genre",              
+    values_to = "count"              
+  ) %>%
+  filter(count == 1) %>%  # Filter for presence of that genre
+  group_by(year, genre) %>%
+  summarize(avg_price = mean(price_usd, na.rm = TRUE)) %>%
+  ungroup()
+
+# Plot 2: Average Sales Price Over Time by genre
+plot2 <- plot_ly(
+  df_long_genre_price, 
+  x = ~year, 
+  y = ~avg_price, 
+  color = ~genre, 
+  type = 'scatter', 
+  mode = 'lines'
+) %>%
+  layout(
+    title = "Average Sales Price by Genre Over Time",
+    xaxis = list(title = "Year"),
+    yaxis = list(title = "Average Price (USD)"),
+    template = "plotly_white"
+  )
+
+subplot(plot1, plot2)
+```
+
+
+
+
+
+<h3>Problem 3 - data.table</h3>
+
+Part (A) - Generate a table (which can just be a nicely printed tibble) reporting the mean and median departure delay per airport. Generate a second table (which again can be a nicely printed tibble) reporting the mean and median arrival delay per airport. Exclude any destination with under 10 flights. Do this exclusion through code, not manually.
+
+Additionally,
+
+Order both tables in descending mean delay.
+Both tables should use the airport names not the airport codes.
+Both tables should print all rows.
+```{r}
+library(nycflights13)
+library(data.table)
+
+# convert flights to a data.table
+flights <- data.table(flights)
+
+# merge flights with airports by the "faa" column
+merged <- merge(flights[, faa := origin],
+                airports,
+                by = "faa",
+                all.x = TRUE)
+
+# calculate statistics and filter results
+merged[, .(N = .N,
+           mean_delay = mean(dep_delay, na.rm = TRUE),
+           med_delay = median(dep_delay, na.rm = TRUE)),
+       by = name] |>
+  (\(x) x[N >= 10, !"N"])() |>
+  (\(x) x[order(mean_delay, decreasing = TRUE)])()
+```
+
+
+Part (B) - How many flights did the aircraft model with the fastest average speed take? Produce a tibble with 1 row, and entries for the model, average speed (in MPH) and number of flights.
+```{r}
+# convert flights to a data.table
+flights <- data.table(flights)
+
+# merge flights with airports by the "faa" column, using "dest" as the faa
+merged <- merge(flights[, faa := dest],
+                airports,
+                by = "faa",
+                all.x = TRUE)
+
+# calculate statistics and filter the results
+merged[, .(
+    name = ifelse(is.na(first(name)), first(faa), first(name)),
+    N = .N,
+    mean_delay = mean(arr_delay, na.rm = TRUE),
+    med_delay = median(arr_delay, na.rm = TRUE)
+), by = faa] |>
+  (\(x) x[N >= 10, !c("faa", "N")])() |>
+  (\(x) x[order(mean_delay, decreasing = TRUE)])() |>
+  (\(x) print(x, nrows = 10000))()
+```
+
+
+
+
