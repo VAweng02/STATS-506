@@ -14,8 +14,7 @@ Part (A) - For the rational class, define the following:
 2. A validator that ensures the denominator is non-zero.
 3. A show method.
 4. A simplify method, to obtain the simplest form (e.g. simplify(2/4) produces 1/2).
-5. A quotient method (e.g. quotient(3/7) produces .42857143...). It should support a digits argument but only in the printing, not the returned result (Hint: what does print return?).
-6. Addition, subtraction, multiplication, division. These should all return a rational.
+5. A quotient method (e.g. quotient(3/7) produces .42857143...). It should support a digits argument but only in the printing, not the returned result (Hint: what does print return?).6. Addition, subtraction, multiplication, division. These should all return a rational.
 7. You’ll (probably) need GCD and LCM as part of some of these calculations; include these functions using Rcpp. Even if you don’t need these functions for another calculation, include them.
 
 ```{r}
@@ -152,7 +151,7 @@ for (expr in expressions) {
 ```
 
 Part(C) - Show that your validator does not allow the creation of rational’s with 0 denominator, and check other malformed input to your constructor.
-```{r error=true}
+```{r error:true}
 # valid example: should succeed and simplify to 4/1
 tryCatch({
   r1 <- Rational(24, 6)
@@ -184,7 +183,6 @@ tryCatch({
 }, error = function(e) {
   cat("Error:", e$message, "\n")
 })
-
 ```
 As shown above, the validator does not allow the creation of rationals with 0 denominator. Furthermore, it also checks that numerator and denominator are numeric inputs. Finally, it also checks that if inputs are convertible to numeric and converts it make a rational number.
 
@@ -195,94 +193,282 @@ As shown above, the validator does not allow the creation of rationals with 0 de
 Let’s revisit the art data from the last problem set. Use plotly for these.
 
 Part (A) - Regenerate your plot which addresses the second question from last time:
+
+ii. Does the distribution of genre of sales across years appear to change?
+
+You may copy your plot from last time, or copy my plot from the solutions, or come up with your own new plot.
+
 ```{r}
-library(dplyr)
-library(tidyr)
 library(plotly)
+library(dplyr)
 
 # read in data
-df <- read.csv("df_for_ml_improved_new_market.csv")
+art <- read.csv("df_for_ml_improved_new_market.csv")
 
-# tidyverse pipeline
-df_long <- df %>%
-  pivot_longer(cols = starts_with("Genre___"), 
-               names_to = "genre", 
-               values_to = "count") %>%
-  filter(count == 1) %>%
-  group_by(year, genre) %>%
-  summarise(count = n(), .groups = "drop") %>%
-  group_by(year) %>%
-  mutate(proportion = count / sum(count))
+# create 'genre' column
+art$Genre___Others[art$Genre___Painting == 1] <- 0
+art$genre <- "Photography"
+art$genre[art$Genre___Print == 1] <- "Print"
+art$genre[art$Genre___Sculpture == 1] <- "Sculpture"
+art$genre[art$Genre___Painting == 1] <- "Painting"
+art$genre[art$Genre___Others == 1] <- "Other"
 
-# create stacked bar chart using plotly
-plot <- plot_ly(df_long, x = ~year, y = ~proportion, type = 'bar', 
-                color = ~genre, colors = 'Set3') %>%
-  layout(barmode = 'stack',
-         title = list(text = "Distribution of Genre of Sales Across Years", x = 0.5),
-         xaxis = list(title = "Year", titlefont = list(size = 14), tickfont = list(size = 12)),
-         yaxis = list(title = "Proportion of Sales", titlefont = list(size = 14), tickfont = list(size = 12)))
+# create table and calculate proportions
+yeargenre <- table(art$year, art$genre)
+ygperc <- prop.table(yeargenre, 1)
+
+# ensure correct order of genres
+ygperc <- ygperc[, c("Painting", "Sculpture", "Photography", "Print", "Other")]
+
+# convert to df for Plotly
+ygperc_df <- as.data.frame(as.table(ygperc))
+colnames(ygperc_df) <- c("Year", "Genre", "Proportion")
+
+# create horizontal stacked bar chart
+plot <- plot_ly(
+  data = ygperc_df,
+  x = ~Proportion,
+  y = ~Year,
+  color = ~Genre,
+  type = "bar",
+  orientation = "h",
+  colors = c("pink", "lightblue", "lightgreen", "yellow", "orange")
+) %>%
+  layout(
+    barmode = "stack",
+    xaxis = list(title = "Proportion of Genre of Art Sales"),
+    yaxis = list(title = "Year"),
+    legend = list(title = list(text = "Genre"))
+  )
 
 plot
 ```
-
+As shown above, the distribution of genre sales across years does appear to change. The bar chart shows the changing distribution of art sales proportions by genre from 1997 to 2012. Paintings (red) dominated in the late 1990s but steadily declined, while photography (green) rose significantly, especially after 2005. Sculptures (blue) remained relatively stable, with minor fluctuations, and prints (yellow) gained a small but noticeable increase after 2010. The "Other" category (orange) consistently contributed a minimal share. These trends highlight shifts in buyer preferences and market dynamics over the 15-year period.
 
 
 Part (B) - Generate an interactive plot with plotly that can address both of these questions from last time.
 
+i. Is there a change in the sales price in USD over time?
+
+ii. How does the genre affect the change in sales price over time?
+
 This should be a single interactive plot, with which a user can manipulate the view to be able to look at change over time overall, or by genre.
+
+
+Plotting first graph
 ```{r}
-library(dplyr)
 library(plotly)
-library(tidyr)
 
-# Calculate the average price_usd for each year
-average_price_by_year <- df %>%
-  group_by(year) %>%
-  summarize(avg_price = mean(price_usd, na.rm = TRUE))
+# read in the data
+art <- read.csv("df_for_ml_improved_new_market.csv")
 
-# Plot 1: Average Sales Price Over Time
-plot1 <- plot_ly(
-  average_price_by_year, 
-  x = ~year, 
-  y = ~avg_price, 
-  type = 'scatter', 
-  mode = 'lines+markers',
-  line = list(color = 'blue', width = 1.2),
-  marker = list(color = 'red', size = 6, line = list(width = 1, color = 'white')),
-  name = "Average Price Over Time",
-  visible = TRUE  # Set this to visible by default
-)
+# function to select top values above a given percentile
+select_top_values <- function(vec, percentile) {
+  val <- quantile(vec, percentile)
+  return(vec[vec > val])
+}
 
-# Reshape and summarize data
-df_long_genre_price <- df %>%
-  pivot_longer(
-    cols = starts_with("Genre___"),  
-    names_to = "genre",              
-    values_to = "count"              
+# prepare data for the box plot
+save <- list()
+for (y in unique(art$year)) {
+  prices <- art[art$year == y, "price_usd"]
+  save[[as.character(y)]] <- 
+    data.frame(year = y,
+               price_usd = select_top_values(prices, 0.95))
+}
+arttop <- do.call(rbind, save)
+
+# prepare data for the median line
+artmedian <- aggregate(art$price_usd, by = list(art$year), FUN = median, na.rm = TRUE)
+names(artmedian) <- c("year", "price_usd")
+
+# create Plotly plot
+plot <- plot_ly() %>%
+  add_trace(
+    data = arttop,
+    x = ~year,
+    y = ~price_usd,
+    type = "box",
+    name = "Top 5%",
+    marker = list(symbol = "x")
   ) %>%
-  filter(count == 1) %>%  # Filter for presence of that genre
-  group_by(year, genre) %>%
-  summarize(avg_price = mean(price_usd, na.rm = TRUE)) %>%
-  ungroup()
-
-# Plot 2: Average Sales Price Over Time by genre
-plot2 <- plot_ly(
-  df_long_genre_price, 
-  x = ~year, 
-  y = ~avg_price, 
-  color = ~genre, 
-  type = 'scatter', 
-  mode = 'lines'
-) %>%
+  add_trace(
+    data = artmedian,
+    x = ~year,
+    y = ~price_usd,
+    type = "scatter",
+    mode = "lines+markers",
+    line = list(dash = "dot", width = 2),
+    name = "Median"
+  ) %>%
   layout(
-    title = "Average Sales Price by Genre Over Time",
+    title = "Changes in Top 5% of Prices",
     xaxis = list(title = "Year"),
-    yaxis = list(title = "Average Price (USD)"),
-    template = "plotly_white"
+    yaxis = list(
+      title = "Price in Million USD",
+      tickvals = seq(0, 1400000, by = 200000),
+      ticktext = paste(seq(0, 1.4, 0.2), "M", sep = "")
+    ),
+    legend = list(x = 0.1, y = 0.9)
+  )
+```
+As shown above, there is a change in the sales price in USD over time. The boxplots reveal an upward trend in the top 5% of prices, with the interquartile range (IQR) and outliers expanding significantly in later years, particularly after 2005, indicating increasing variability and higher extreme values. The dashed line representing the median remains relatively low and stable in comparison, emphasizing the disparity between the top 5% and the overall price distribution. The chart suggests that the top 5% of prices have risen considerably over the years, with the rise becoming more pronounced in the mid-2000s.
+
+
+
+Plotting second graph
+```{r}
+library(plotly)
+
+# read in the data
+art <- read.csv("df_for_ml_improved_new_market.csv")
+
+# map genre values
+art$Genre___Others[art$Genre___Painting == 1] <- 0
+art$genre <- "Photography"
+art$genre[art$Genre___Print == 1] <- "Print"
+art$genre[art$Genre___Sculpture == 1] <- "Sculpture"
+art$genre[art$Genre___Painting == 1] <- "Painting"
+art$genre[art$Genre___Others == 1] <- "Other"
+
+# prepare the median and 97.5th percentile data by genre and year
+artmedian <- aggregate(price_usd ~ year + genre, data = art, FUN = median, na.rm = TRUE)
+art975 <- aggregate(price_usd ~ year + genre, data = art, FUN = function(x) quantile(x, 0.975, na.rm = TRUE))
+
+# initialize Plotly figure
+plot1 <- plot_ly()
+
+# add lines for each genre for median and 97.5th percentile
+genres <- unique(art$genre)
+for (i in seq_along(genres)) {
+  genre <- genres[i]
+  
+  # median line
+  plot1 <- plot1 %>%
+    add_trace(
+      data = artmedian[artmedian$genre == genre, ],
+      x = ~year,
+      y = ~price_usd,
+      type = "scatter",
+      mode = "lines",
+      line = list(color = i, width = 3),
+      name = paste("Median", genre)
+    )
+  
+  # 97.5th percentile line
+  plot1 <- plot1 %>%
+    add_trace(
+      data = art975[art975$genre == genre, ],
+      x = ~year,
+      y = ~price_usd,
+      type = "scatter",
+      mode = "lines",
+      line = list(color = i, dash = "dot", width = 3),
+      name = paste("97.5% Percentile", genre)
+    )
+}
+
+# add layout elements
+plot1 <- plot1 %>%
+  layout(
+    title = "Changes in Price by Genre",
+    xaxis = list(title = "Year", tickvals = seq(1997, 2012, by = 2)),
+    yaxis = list(
+      title = "Price in Thousands USD",
+      tickvals = seq(0, 350000, by = 50000),
+      ticktext = paste(seq(0, 350, by = 50), "k", sep = "")
+    ),
+    legend = list(x = 0.1, y = 0.9)
   )
 
-subplot(plot1, plot2)
+# render the plot
+plot1
 ```
+The graph shows that genre impacts sales prices significantly over time. Sculpture and Painting display consistent growth in both median and 97.5th percentile prices, indicating stability and sustained value. Photography and Print, however, show sharp spikes in the 97.5th percentile, reflecting occasional high-value sales and greater volatility. The "Other" category remains the lowest in price with minimal growth.
+
+
+Generating an interactive plot
+```{r}
+# combine the two plot objects into one
+combined_graph <- plot_ly() |>
+  # add traces from the first plot (Top 5% boxplot data)
+  add_trace(
+    data = arttop, # dataset for Top 5% prices
+    x = ~year,
+    y = ~price_usd,
+    type = "box",
+    name = "Top 5%",
+    visible = TRUE
+  ) |>
+  add_trace(
+    data = artmedian, # use `artmedian` for the median line
+    x = ~year,
+    y = ~price_usd,
+    type = "scatter",
+    mode = "lines+markers",
+    line = list(dash = "dot", width = 2),
+    name = "Median",
+    visible = TRUE
+  ) |>
+  # add traces from the second plot (Genre-based scatter plot)
+  add_trace(
+    data = artmedian, # median data for genre-based plot
+    x = ~year,
+    y = ~price_usd,
+    type = "scatter",
+    mode = "lines",
+    color = ~genre,
+    name = "Genre Median",
+    visible = FALSE
+  ) |>
+  add_trace(
+    data = art975, # 97.5th percentile data for genre-based plot
+    x = ~year,
+    y = ~price_usd,
+    type = "scatter",
+    mode = "lines",
+    line = list(dash = "dot"),
+    color = ~genre,
+    name = "97.5% Percentile",
+    visible = FALSE
+  )
+
+# add layout and dropdown menu
+combined_graph <- combined_graph |>
+  layout(
+    xaxis = list(title = "Year"),
+    yaxis = list(title = "Price (USD)"),
+    updatemenus = list(
+      list(
+        y = 1,
+        buttons = list(
+          list(
+            method = "update",
+            args = list(
+              list(visible = c(TRUE, TRUE, FALSE, FALSE)), # Show Top 5% and Median traces
+              list(title = "Top 5% of Sales Price of Art over the Years")
+            ),
+            label = "Overall"
+          ),
+          list(
+            method = "update",
+            args = list(
+              list(visible = c(FALSE, FALSE, TRUE, TRUE)), # Show genre-based traces
+              list(title = "Change in Art Price over the Years by Genre")
+            ),
+            label = "By Genre"
+          )
+        )
+      )
+    )
+  )
+
+# render combined graph
+combined_graph
+```
+As shown above, there is a change in the sales price in USD over time. 
+
+
 
 
 
@@ -342,7 +528,5 @@ merged[, .(
   (\(x) x[order(mean_delay, decreasing = TRUE)])() |>
   (\(x) print(x, nrows = 10000))()
 ```
-
-
 
 
