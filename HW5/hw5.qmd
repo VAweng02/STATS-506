@@ -47,6 +47,37 @@ setClass("Rational",
 
 # constructor function with validation
 Rational <- function(numerator, denominator) {
+  
+  # check if numerator is a string and can be converted to an integer
+  if (is.character(numerator)) {
+    # attempt to convert to integer and check if the result is not NA
+    converted_numerator <- suppressWarnings(as.integer(numerator))
+    if (!is.na(converted_numerator)) {
+      numerator <- converted_numerator
+    } else {
+      stop("Numerator must be convertible to an integer.")
+    }
+  }
+  
+  # check if denominator is a string and can be converted to an integer
+  if (is.character(denominator)) {
+    # attempt to convert to integer and check if the result is not NA
+    converted_denominator <- suppressWarnings(as.integer(denominator))
+    if (!is.na(converted_denominator)) {
+      denominator <- converted_denominator
+    } else {
+      stop("Denominator must be convertible to an integer.")
+    }
+  }
+
+  
+  # checks that a vector of size 2 can be passed in
+  if (is.numeric(numerator) && length(numerator) == 2) {
+    denominator <- numerator[2]
+    numerator <- numerator[1]
+  }
+  
+  
   # ensure numerator and denominator are numeric and convert to int
   if (!is.numeric(numerator) || !is.numeric(denominator)) {
     stop("Both numerator and denominator must be numeric values.")
@@ -114,7 +145,12 @@ r2: 7/230
 r3: 0/40
 
 ```{r}
-# List of expressions to evaluate with tryCatch
+# defining r1, r2, and r3
+r1 <- Rational(24, 6)
+r2 <- Rational(7, 230)
+r3 <- Rational(0, 4)
+
+# list of expressions to evaluate with tryCatch
 expressions <- list(
   quote(r1),
   quote(r3),
@@ -138,13 +174,13 @@ expressions <- list(
   quote(simplify(r3))
 )
 
-# Loop through each expression and evaluate with tryCatch
+# loop through each expression and evaluate with tryCatch
 for (expr in expressions) {
   tryCatch({
-    result <- eval(expr) # Evaluate the expression
-    print(result)        # Print the result if successful
+    result <- eval(expr) # evaluate the expression
+    print(result)        # print result if successful
   }, error = function(e) {
-    cat("Error:", e$message, "\n") # Print error message if there's an error
+    cat("Error:", e$message, "\n") # print error message if error
   })
 }
 
@@ -152,7 +188,7 @@ for (expr in expressions) {
 
 Part(C) - Show that your validator does not allow the creation of rational’s with 0 denominator, and check other malformed input to your constructor.
 ```{r error:true}
-# valid example: should succeed and simplify to 4/1
+# valid example: should succeed
 tryCatch({
   r1 <- Rational(24, 6)
   print(r1)
@@ -183,8 +219,18 @@ tryCatch({
 }, error = function(e) {
   cat("Error:", e$message, "\n")
 })
+
+# valid example: str inputs that can be converted to int will be converted to make the Rational object
+tryCatch({
+  r4 <- Rational("10", "4")
+  print(r4)
+}, error = function(e) {
+  cat("Error:", e$message, "\n")
+})
+
+
 ```
-As shown above, the validator does not allow the creation of rationals with 0 denominator. Furthermore, it also checks that numerator and denominator are numeric inputs. Finally, it also checks that if inputs are convertible to numeric and converts it make a rational number.
+As shown above, the validator does not allow the creation of rationals with 0 denominator. Furthermore, it also checks that numerator and denominator are numeric inputs. Additionally, it also converts string inputs to integer if it is flexible, adding additional flexibility to the different inputs. Finally, it also checks that if floats are convertible to ints and converts it make a rational number.
 
 
 
@@ -311,6 +357,9 @@ plot <- plot_ly() %>%
     ),
     legend = list(x = 0.1, y = 0.9)
   )
+
+# render the plot
+plot
 ```
 As shown above, there is a change in the sales price in USD over time. The boxplots reveal an upward trend in the top 5% of prices, with the interquartile range (IQR) and outliers expanding significantly in later years, particularly after 2005, indicating increasing variability and higher extreme values. The dashed line representing the median remains relatively low and stable in comparison, emphasizing the disparity between the top 5% and the overall price distribution. The chart suggests that the top 5% of prices have risen considerably over the years, with the rise becoming more pronounced in the mid-2000s.
 
@@ -503,11 +552,8 @@ merged[, .(N = .N,
        by = name] |>
   (\(x) x[N >= 10, !"N"])() |>
   (\(x) x[order(mean_delay, decreasing = TRUE)])()
-```
 
 
-Part (B) - How many flights did the aircraft model with the fastest average speed take? Produce a tibble with 1 row, and entries for the model, average speed (in MPH) and number of flights.
-```{r}
 # convert flights to a data.table
 flights <- data.table(flights)
 
@@ -529,4 +575,31 @@ merged[, .(
   (\(x) print(x, nrows = 10000))()
 ```
 
+
+Part (B) - How many flights did the aircraft model with the fastest average speed take? Produce a tibble with 1 row, and entries for the model, average speed (in MPH) and number of flights.
+```{r}
+library(data.table)
+
+# Convert data.frames to data.tables
+flights_dt <- as.data.table(flights)
+planes_dt <- as.data.table(planes)
+
+# using data.table
+result <- flights_dt[
+  planes_dt, 
+  on = "tailnum"  # Join by "tailnum"
+][
+  , mph := distance / (air_time / 60)  # Calculate mph
+][
+  # calculate avg_mph and num_flights
+  , .(avg_mph = mean(mph, na.rm = TRUE), num_flights = .N), by = model
+][
+  order(-avg_mph)  # order by avg_mph descending
+][
+  1  # select first row
+]
+
+print(result)
+```
+As shown above, the aircraft model with the fastest average speed took 4 flights.
 
