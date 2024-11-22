@@ -1,0 +1,120 @@
+---
+title: "STATS 506 - Homework 6"
+author: "Vincent Weng"
+format:
+  html:
+    embed-resources: true
+---
+
+<h3>Stratified Bootstrapping</h3>
+
+Part (A) - Calculate the average RF for each team in the Fielding table. Then, since we don’t have a closed form for the standard deviation of this statistic, carry out a stratified bootstrap by team to estimate it. Do this out three ways:
+
+1. Without any parallel processing
+2. Using parallel processing with the parallel package.
+3. Using futures with the future package.
+
+
+Loading in data
+```{r}
+library(DBI)
+library(RSQLite)
+library(tidyverse)
+
+# Connect to the Lahman database
+con <- dbConnect(RSQLite::SQLite(), "lahman_1871-2022.sqlite")
+
+# dbListTables(con)
+
+fielding <- dbReadTable(con, "Fielding")
+
+# Compute RF for each player
+fielding$RF <- 3 * (fielding$PO + fielding$A) / fielding$InnOuts
+
+# Average RF by team
+team_rf <- fielding %>%
+  group_by(teamID) %>%
+  summarize(avg_RF = mean(RF, na.rm = TRUE))
+
+dbDisconnect(con)
+```
+
+
+Without any parallel processing
+```{r}
+bootstrap_rf <- function(data, n_bootstrap = 1000) {
+  replicate(n_bootstrap, {
+    sample_data <- data %>%
+      group_by(teamID) %>%
+      sample_frac(replace = TRUE)
+    mean(sample_data$RF, na.rm = TRUE)
+  })
+}
+
+boot_results <- bootstrap_rf(fielding)
+sd(boot_results)  # Standard deviation of the bootstrap samples
+```
+
+
+
+Using parallel processing with the parallel package
+```{r}
+library(parallel)
+
+cl <- makeCluster(detectCores() - 1)
+clusterExport(cl, "fielding")
+
+boot_results_parallel <- parLapply(cl, 1:1000, function(i) {
+  sample_data <- fielding %>%
+    group_by(teamID) %>%
+    sample_frac(replace = TRUE)
+  mean(sample_data$RF, na.rm = TRUE)
+})
+
+stopCluster(cl)
+
+sd(unlist(boot_results_parallel))
+
+```
+
+
+Using futures with the future package
+```{r}
+library(future)
+library(furrr)
+
+plan(multisession)  # Use parallel processing
+
+
+boot_results_future <- future_map_dbl(1:1000, ~ {
+  sample_data <- fielding %>%
+    group_by(teamID) %>%
+    sample_frac(replace = TRUE)
+  mean(sample_data$RF, na.rm = TRUE)
+})
+
+
+sd(boot_results_future)
+
+```
+
+
+
+
+
+
+Part (B) - Generate a table showing the estimated RF and associated standard errors from the three approaches.
+```{r}
+
+
+```
+
+
+
+Part (C) - Report and discuss the performance difference between the versions.
+```{r}
+
+
+```
+
+
