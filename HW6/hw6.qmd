@@ -21,12 +21,24 @@ library(DBI)
 library(RSQLite)
 library(tidyverse)
 
-# Connect to the Lahman database
+# Connect to Lahman db
 con <- dbConnect(RSQLite::SQLite(), "lahman_1871-2022.sqlite")
 
-# dbListTables(con)
-
 fielding <- dbReadTable(con, "Fielding")
+
+fielding <- fielding %>%
+  mutate(RF = 3 * (PO + A) / InnOuts)  # Compute RF
+
+fielding <- fielding %>%
+  filter(InnOuts > 0)  # Remove rows where InnOuts are zero
+
+fielding <- fielding %>%
+  mutate(RF = ifelse(is.nan(RF) | is.infinite(RF), NA, RF))
+
+# Check if any invalid values remain
+sum(is.infinite(fielding$RF))  # Should return 0
+sum(is.nan(fielding$RF))      # Should return 0
+sum(is.na(fielding$RF))       # Count rows where RF is NA
 
 # Compute RF for each player
 fielding$RF <- 3 * (fielding$PO + fielding$A) / fielding$InnOuts
@@ -40,20 +52,40 @@ dbDisconnect(con)
 ```
 
 
+
+
 Without any parallel processing
 ```{r}
-bootstrap_rf <- function(data, n_bootstrap = 1000) {
-  replicate(n_bootstrap, {
-    sample_data <- data %>%
+##' @title Stratified Bootstrap function
+##' @param data and number of bootstrap samples
+##' @return 1000 bootstrap samples
+stratified_bootstrap <- function(data, n_boot = 1000) {
+  replicate(n_boot, {
+    data %>%
       group_by(teamID) %>%
-      sample_frac(replace = TRUE)
-    mean(sample_data$RF, na.rm = TRUE)
-  })
+      sample_n(size = n(), replace = TRUE) %>%
+      summarise(avg_RF = mean(RF, na.rm = TRUE))
+  }, simplify = FALSE) %>%
+    bind_rows(.id = "replicate")
 }
 
-boot_results <- bootstrap_rf(fielding)
-sd(boot_results)  # Standard deviation of the bootstrap samples
+set.seed(123) # Set seed
+boot_no_parallel <- stratified_bootstrap(fielding, n_boot = 1000)
+
+# Computing estimated RF and SE for teams with 10 highest RF
+top_10_teams1 <- boot_no_parallel %>%
+                  group_by(teamID) %>% # Group by teamID
+                  summarise(
+                    mean_RF = mean(avg_RF, na.rm = TRUE), # Calculate mean RF
+                    std_error = sd(avg_RF, na.rm = TRUE) # Calculate SE
+                  ) %>%
+                  arrange(desc(mean_RF)) %>% # Sort by mean RF desc
+                  slice(1:10) 
+
+print(top_10_teams1)
 ```
+
+
 
 
 
@@ -61,20 +93,35 @@ Using parallel processing with the parallel package
 ```{r}
 library(parallel)
 
+# Define number of cores
 cl <- makeCluster(detectCores() - 1)
-clusterExport(cl, "fielding")
+clusterExport(cl, varlist = c("fielding", "stratified_bootstrap"))
+clusterEvalQ(cl, library(dplyr))
 
-boot_results_parallel <- parLapply(cl, 1:1000, function(i) {
-  sample_data <- fielding %>%
+# Perform stratified bootstrap
+set.seed(123)
+boot_parallel <- parLapply(cl, 1:1000, function(i) {
+  fielding %>%
     group_by(teamID) %>%
-    sample_frac(replace = TRUE)
-  mean(sample_data$RF, na.rm = TRUE)
+    sample_n(size = n(), replace = TRUE) %>%
+    summarise(avg_RF = mean(RF, na.rm = TRUE))
 })
-
 stopCluster(cl)
 
-sd(unlist(boot_results_parallel))
+# Combine results
+boot_parallel <- bind_rows(boot_parallel, .id = "replicate")
 
+# Computing estimated RF and SE for teams with 10 highest RF
+top_10_teams2 <- boot_parallel %>%
+                  group_by(teamID) %>% # Group by teamID
+                  summarise(
+                    mean_RF = mean(avg_RF, na.rm = TRUE), # Calculate mean RF
+                    std_error = sd(avg_RF, na.rm = TRUE) # Calculate SE
+                  ) %>%
+                  arrange(desc(mean_RF)) %>% # Sort by mean RF desc
+                  slice(1:10) 
+
+print(top_10_teams2)
 ```
 
 
@@ -83,21 +130,31 @@ Using futures with the future package
 library(future)
 library(furrr)
 
-plan(multisession)  # Use parallel processing
+plan(multisession, workers = detectCores() - 1)
 
-
-boot_results_future <- future_map_dbl(1:1000, ~ {
-  sample_data <- fielding %>%
-    group_by(teamID) %>%
-    sample_frac(replace = TRUE)
-  mean(sample_data$RF, na.rm = TRUE)
+# Using future package
+suppressWarnings({
+  # Code block where warnings are suppressed
+  boot_futures <- future_map_dfr(1:1000, ~ {
+    fielding %>%
+      group_by(teamID) %>%
+      sample_n(size = n(), replace = TRUE) %>%
+      summarise(avg_RF = mean(RF, na.rm = TRUE))
+  }, future.seed = TRUE)
 })
 
+# Computing estimated RF and SE for teams with 10 highest RF
+top_10_teams3 <- boot_futures %>%
+                  group_by(teamID) %>% # Group by teamID
+                  summarise(
+                    mean_RF = mean(avg_RF, na.rm = TRUE), # Calculate mean RF
+                    std_error = sd(avg_RF, na.rm = TRUE) # Calculate SE
+                  ) %>%
+                  arrange(desc(mean_RF)) %>% # Sort by mean RF desc
+                  slice(1:10) 
 
-sd(boot_results_future)
-
+print(top_10_teams3)
 ```
-
 
 
 
@@ -105,8 +162,19 @@ sd(boot_results_future)
 
 Part (B) - Generate a table showing the estimated RF and associated standard errors from the three approaches.
 ```{r}
+library(dplyr)
+library(knitr)
 
+# Add a column to each dataset to identify the method
+top_10_teams1 <- top_10_teams1 %>% mutate(Method = "No Parallel")
+top_10_teams2 <- top_10_teams2 %>% mutate(Method = "Parallel")
+top_10_teams3 <- top_10_teams3 %>% mutate(Method = "Futures")
 
+# Combine all results into one table (30 rows)
+combined_results <- bind_rows(top_10_teams1, top_10_teams2, top_10_teams3)
+
+# Print the combined table
+kable(combined_results, caption = "Estimated RF and Standard Errors from Three Approaches")
 ```
 
 
