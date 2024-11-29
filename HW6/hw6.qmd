@@ -14,7 +14,6 @@ Part (A) - Calculate the average RF for each team in the Fielding table. Then, s
 2. Using parallel processing with the parallel package.
 3. Using futures with the future package.
 
-
 Loading in data
 ```{r}
 library(DBI)
@@ -22,36 +21,17 @@ library(RSQLite)
 library(tidyverse)
 
 # Connect to Lahman db
-con <- dbConnect(RSQLite::SQLite(), "lahman_1871-2022.sqlite")
+lahman <- dbConnect(RSQLite::SQLite(), "lahman_1871-2022.sqlite")
 
-fielding <- dbReadTable(con, "Fielding")
-
-fielding <- fielding %>%
-  mutate(RF = 3 * (PO + A) / InnOuts)  # Compute RF
-
-fielding <- fielding %>%
-  filter(InnOuts > 0)  # Remove rows where InnOuts are zero
-
-fielding <- fielding %>%
-  mutate(RF = ifelse(is.nan(RF) | is.infinite(RF), NA, RF))
-
-# Check if any invalid values remain
-sum(is.infinite(fielding$RF))  # Should return 0
-sum(is.nan(fielding$RF))      # Should return 0
-sum(is.na(fielding$RF))       # Count rows where RF is NA
-
-# Compute RF for each player
-fielding$RF <- 3 * (fielding$PO + fielding$A) / fielding$InnOuts
-
-# Average RF by team
-team_rf <- fielding %>%
-  group_by(teamID) %>%
-  summarize(avg_RF = mean(RF, na.rm = TRUE))
-
-dbDisconnect(con)
+# SQL query to calculate RF
+fielding <- dbGetQuery(lahman, "
+  SELECT teamID, playerID, PO, A, InnOuts,
+         3 * ((PO + A) * 1.0 / InnOuts) AS RF
+  FROM Fielding
+  WHERE InnOuts > 0
+  GROUP BY playerID
+")
 ```
-
-
 
 
 Without any parallel processing
