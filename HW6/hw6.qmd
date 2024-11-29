@@ -70,7 +70,9 @@ stratified_bootstrap <- function(data, n_boot = 1000) {
 }
 
 set.seed(123) # Set seed
-boot_no_parallel <- stratified_bootstrap(fielding, n_boot = 1000)
+time_no_parallel <- system.time({
+  boot_no_parallel <- stratified_bootstrap(fielding, n_boot = 1000)
+})
 
 # Computing estimated RF and SE for teams with 10 highest RF
 top_10_teams1 <- boot_no_parallel %>%
@@ -94,23 +96,25 @@ Using parallel processing with the parallel package
 library(parallel)
 
 # Define number of cores
-cl <- makeCluster(detectCores() - 1)
-clusterExport(cl, varlist = c("fielding", "stratified_bootstrap"))
-clusterEvalQ(cl, library(dplyr))
-
-# Perform stratified bootstrap
-set.seed(123)
-boot_parallel <- parLapply(cl, 1:1000, function(i) {
-  fielding %>%
-    group_by(teamID) %>%
-    sample_n(size = n(), replace = TRUE) %>%
-    summarise(avg_RF = mean(RF, na.rm = TRUE))
+time_parallel <- system.time({
+  cl <- makeCluster(detectCores() - 1)
+  clusterExport(cl, varlist = c("fielding", "stratified_bootstrap"))
+  clusterEvalQ(cl, library(dplyr))
+  
+  # Perform stratified bootstrap
+  set.seed(123)
+  boot_parallel <- parLapply(cl, 1:1000, function(i) {
+    fielding %>%
+      group_by(teamID) %>%
+      sample_n(size = n(), replace = TRUE) %>%
+      summarise(avg_RF = mean(RF, na.rm = TRUE))
+  })
+  stopCluster(cl)
+  
+  # Combine results
+  boot_parallel <- bind_rows(boot_parallel, .id = "replicate")
 })
-stopCluster(cl)
-
-# Combine results
-boot_parallel <- bind_rows(boot_parallel, .id = "replicate")
-
+  
 # Computing estimated RF and SE for teams with 10 highest RF
 top_10_teams2 <- boot_parallel %>%
                   group_by(teamID) %>% # Group by teamID
@@ -135,12 +139,14 @@ plan(multisession, workers = detectCores() - 1)
 # Using future package
 suppressWarnings({
   # Code block where warnings are suppressed
-  boot_futures <- future_map_dfr(1:1000, ~ {
-    fielding %>%
-      group_by(teamID) %>%
-      sample_n(size = n(), replace = TRUE) %>%
-      summarise(avg_RF = mean(RF, na.rm = TRUE))
-  }, future.seed = TRUE)
+  time_futures <- system.time({
+    boot_futures <- future_map_dfr(1:1000, ~ {
+      fielding %>%
+        group_by(teamID) %>%
+        sample_n(size = n(), replace = TRUE) %>%
+        summarise(avg_RF = mean(RF, na.rm = TRUE))
+    }, future.seed = TRUE)
+  })
 })
 
 # Computing estimated RF and SE for teams with 10 highest RF
@@ -181,8 +187,11 @@ kable(combined_results, caption = "Estimated RF and Standard Errors from Three A
 
 Part (C) - Report and discuss the performance difference between the versions.
 ```{r}
-
-
+# Combine execution times into a table
+time_table <- data.frame(
+  Method = c("No Parallel", "Parallel", "Futures"),
+  Execution_Time = c(time_no_parallel[3], time_parallel[3], time_futures[3])
+)
+print(time_table)
 ```
-
-
+The performance comparison shows that parallel processing significantly improves execution speed. The No Parallel method took the longest at 22.52 seconds, while the Parallel and Futures methods reduced execution time to 4.913 seconds and 5.342 seconds, respectively. Parallel offers the best performance, but Futures provides a more user-friendly interface with comparable efficiency. Both Parallel and Futures are far more suitable than No Parallel for computationally intensive tasks like bootstrapping.

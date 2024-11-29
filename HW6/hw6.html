@@ -3125,24 +3125,22 @@ Stratified Bootstrapping
 ✖ dplyr::lag()    masks stats::lag()
 ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Connect to the Lahman database</span></span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Connect to Lahman db</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>con <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(RSQLite<span class="sc">::</span><span class="fu">SQLite</span>(), <span class="st">&quot;lahman_1871-2022.sqlite&quot;</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># dbListTables(con)</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>fielding <span class="ot">&lt;-</span> <span class="fu">dbReadTable</span>(con, <span class="st">&quot;Fielding&quot;</span>)</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>fielding <span class="ot">&lt;-</span> <span class="fu">dbReadTable</span>(con, <span class="st">&quot;Fielding&quot;</span>)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>fielding <span class="ot">&lt;-</span> fielding <span class="sc">%&gt;%</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">RF =</span> <span class="dv">3</span> <span class="sc">*</span> (PO <span class="sc">+</span> A) <span class="sc">/</span> InnOuts)  <span class="co"># Compute RF</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>fielding <span class="ot">&lt;-</span> fielding <span class="sc">%&gt;%</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(InnOuts <span class="sc">&gt;</span> <span class="dv">0</span>)  <span class="co"># Remove rows where InnOuts is zero</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>fielding <span class="ot">&lt;-</span> fielding <span class="sc">%&gt;%</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">RF =</span> <span class="fu">ifelse</span>(<span class="fu">is.nan</span>(RF) <span class="sc">|</span> <span class="fu">is.infinite</span>(RF), <span class="cn">NA</span>, RF))</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if any invalid values remain</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">is.infinite</span>(fielding<span class="sc">$</span>RF))  <span class="co"># Should return 0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>fielding <span class="ot">&lt;-</span> fielding <span class="sc">%&gt;%</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">RF =</span> <span class="dv">3</span> <span class="sc">*</span> (PO <span class="sc">+</span> A) <span class="sc">/</span> InnOuts)  <span class="co"># Compute RF</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>fielding <span class="ot">&lt;-</span> fielding <span class="sc">%&gt;%</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(InnOuts <span class="sc">&gt;</span> <span class="dv">0</span>)  <span class="co"># Remove rows where InnOuts are zero</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>fielding <span class="ot">&lt;-</span> fielding <span class="sc">%&gt;%</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">RF =</span> <span class="fu">ifelse</span>(<span class="fu">is.nan</span>(RF) <span class="sc">|</span> <span class="fu">is.infinite</span>(RF), <span class="cn">NA</span>, RF))</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if any invalid values remain</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">is.infinite</span>(fielding<span class="sc">$</span>RF))  <span class="co"># Should return 0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0</code></pre>
 </div>
@@ -3166,30 +3164,35 @@ Stratified Bootstrapping
 </div>
 <p>Without any parallel processing</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>stratified_bootstrap <span class="ot">&lt;-</span> <span class="cf">function</span>(data, <span class="at">n_boot =</span> <span class="dv">1000</span>) {</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">replicate</span>(n_boot, {</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    data <span class="sc">%&gt;%</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_by</span>(teamID) <span class="sc">%&gt;%</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sample_n</span>(<span class="at">size =</span> <span class="fu">n</span>(), <span class="at">replace =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">summarise</span>(<span class="at">avg_RF =</span> <span class="fu">mean</span>(RF, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  }, <span class="at">simplify =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">bind_rows</span>(<span class="at">.id =</span> <span class="st">&quot;replicate&quot;</span>)</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>boot_no_parallel <span class="ot">&lt;-</span> <span class="fu">stratified_bootstrap</span>(fielding, <span class="at">n_boot =</span> <span class="dv">1000</span>)</span>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="do">##&#39; @title Stratified Bootstrap function</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="do">##&#39; @param data and number of bootstrap samples</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="do">##&#39; @return 1000 bootstrap samples</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>stratified_bootstrap <span class="ot">&lt;-</span> <span class="cf">function</span>(data, <span class="at">n_boot =</span> <span class="dv">1000</span>) {</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">replicate</span>(n_boot, {</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    data <span class="sc">%&gt;%</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_by</span>(teamID) <span class="sc">%&gt;%</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sample_n</span>(<span class="at">size =</span> <span class="fu">n</span>(), <span class="at">replace =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">summarise</span>(<span class="at">avg_RF =</span> <span class="fu">mean</span>(RF, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  }, <span class="at">simplify =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">bind_rows</span>(<span class="at">.id =</span> <span class="st">&quot;replicate&quot;</span>)</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply the function to the boot_no_parallel results</span></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>top_10_teams <span class="ot">&lt;-</span> boot_no_parallel <span class="sc">%&gt;%</span></span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">group_by</span>(teamID) <span class="sc">%&gt;%</span>                          <span class="co"># Group by teamID</span></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">summarise</span>(</span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>                    <span class="at">mean_RF =</span> <span class="fu">mean</span>(avg_RF, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),       <span class="co"># Calculate mean RF</span></span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>                    <span class="at">std_error =</span> <span class="fu">sd</span>(avg_RF, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)        <span class="co"># Calculate standard error</span></span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>                  ) <span class="sc">%&gt;%</span></span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">arrange</span>(<span class="fu">desc</span>(mean_RF)) <span class="sc">%&gt;%</span>                    <span class="co"># Sort by mean RF in descending order</span></span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>) </span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(top_10_teams)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>) <span class="co"># Set seed</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>time_no_parallel <span class="ot">&lt;-</span> <span class="fu">system.time</span>({</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  boot_no_parallel <span class="ot">&lt;-</span> <span class="fu">stratified_bootstrap</span>(fielding, <span class="at">n_boot =</span> <span class="dv">1000</span>)</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Computing estimated RF and SE for teams with 10 highest RF</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>top_10_teams1 <span class="ot">&lt;-</span> boot_no_parallel <span class="sc">%&gt;%</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">group_by</span>(teamID) <span class="sc">%&gt;%</span> <span class="co"># Group by teamID</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">summarise</span>(</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>                    <span class="at">mean_RF =</span> <span class="fu">mean</span>(avg_RF, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="co"># Calculate mean RF</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>                    <span class="at">std_error =</span> <span class="fu">sd</span>(avg_RF, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="co"># Calculate SE</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>                  ) <span class="sc">%&gt;%</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">arrange</span>(<span class="fu">desc</span>(mean_RF)) <span class="sc">%&gt;%</span> <span class="co"># Sort by mean RF desc</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>) </span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(top_10_teams1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 10 × 3
    teamID mean_RF std_error
@@ -3210,220 +3213,124 @@ Stratified Bootstrapping
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(parallel)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the number of cores</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>cl <span class="ot">&lt;-</span> <span class="fu">makeCluster</span>(<span class="fu">detectCores</span>() <span class="sc">-</span> <span class="dv">1</span>)</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">clusterExport</span>(cl, <span class="at">varlist =</span> <span class="fu">c</span>(<span class="st">&quot;fielding&quot;</span>, <span class="st">&quot;stratified_bootstrap&quot;</span>))</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="fu">clusterEvalQ</span>(cl, <span class="fu">library</span>(dplyr))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[[1]]
-[1] &quot;dplyr&quot;     &quot;stats&quot;     &quot;graphics&quot;  &quot;grDevices&quot; &quot;utils&quot;     &quot;datasets&quot; 
-[7] &quot;methods&quot;   &quot;base&quot;     
-
-[[2]]
-[1] &quot;dplyr&quot;     &quot;stats&quot;     &quot;graphics&quot;  &quot;grDevices&quot; &quot;utils&quot;     &quot;datasets&quot; 
-[7] &quot;methods&quot;   &quot;base&quot;     
-
-[[3]]
-[1] &quot;dplyr&quot;     &quot;stats&quot;     &quot;graphics&quot;  &quot;grDevices&quot; &quot;utils&quot;     &quot;datasets&quot; 
-[7] &quot;methods&quot;   &quot;base&quot;     
-
-[[4]]
-[1] &quot;dplyr&quot;     &quot;stats&quot;     &quot;graphics&quot;  &quot;grDevices&quot; &quot;utils&quot;     &quot;datasets&quot; 
-[7] &quot;methods&quot;   &quot;base&quot;     
-
-[[5]]
-[1] &quot;dplyr&quot;     &quot;stats&quot;     &quot;graphics&quot;  &quot;grDevices&quot; &quot;utils&quot;     &quot;datasets&quot; 
-[7] &quot;methods&quot;   &quot;base&quot;     
-
-[[6]]
-[1] &quot;dplyr&quot;     &quot;stats&quot;     &quot;graphics&quot;  &quot;grDevices&quot; &quot;utils&quot;     &quot;datasets&quot; 
-[7] &quot;methods&quot;   &quot;base&quot;     
-
-[[7]]
-[1] &quot;dplyr&quot;     &quot;stats&quot;     &quot;graphics&quot;  &quot;grDevices&quot; &quot;utils&quot;     &quot;datasets&quot; 
-[7] &quot;methods&quot;   &quot;base&quot;     
-
-[[8]]
-[1] &quot;dplyr&quot;     &quot;stats&quot;     &quot;graphics&quot;  &quot;grDevices&quot; &quot;utils&quot;     &quot;datasets&quot; 
-[7] &quot;methods&quot;   &quot;base&quot;     
-
-[[9]]
-[1] &quot;dplyr&quot;     &quot;stats&quot;     &quot;graphics&quot;  &quot;grDevices&quot; &quot;utils&quot;     &quot;datasets&quot; 
-[7] &quot;methods&quot;   &quot;base&quot;     </code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Perform stratified bootstrap</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>boot_parallel <span class="ot">&lt;-</span> <span class="fu">parLapply</span>(cl, <span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span>, <span class="cf">function</span>(i) {</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  fielding <span class="sc">%&gt;%</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(teamID) <span class="sc">%&gt;%</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sample_n</span>(<span class="at">size =</span> <span class="fu">n</span>(), <span class="at">replace =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">avg_RF =</span> <span class="fu">mean</span>(RF, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="fu">stopCluster</span>(cl)</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine results</span></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>boot_parallel <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(boot_parallel, <span class="at">.id =</span> <span class="st">&quot;replicate&quot;</span>)</span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply the function to the boot_no_parallel results</span></span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>top_10_teams <span class="ot">&lt;-</span> boot_parallel <span class="sc">%&gt;%</span></span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">group_by</span>(teamID) <span class="sc">%&gt;%</span>                          <span class="co"># Group by teamID</span></span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">summarise</span>(</span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>                    <span class="at">mean_RF =</span> <span class="fu">mean</span>(avg_RF, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),       <span class="co"># Calculate mean RF</span></span>
-<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>                    <span class="at">std_error =</span> <span class="fu">sd</span>(avg_RF, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)        <span class="co"># Calculate standard error</span></span>
-<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>                  ) <span class="sc">%&gt;%</span></span>
-<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">arrange</span>(<span class="fu">desc</span>(mean_RF)) <span class="sc">%&gt;%</span>                    <span class="co"># Sort by mean RF in descending order</span></span>
-<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>) </span>
-<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(top_10_teams)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define number of cores</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>time_parallel <span class="ot">&lt;-</span> <span class="fu">system.time</span>({</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  cl <span class="ot">&lt;-</span> <span class="fu">makeCluster</span>(<span class="fu">detectCores</span>() <span class="sc">-</span> <span class="dv">1</span>)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clusterExport</span>(cl, <span class="at">varlist =</span> <span class="fu">c</span>(<span class="st">&quot;fielding&quot;</span>, <span class="st">&quot;stratified_bootstrap&quot;</span>))</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clusterEvalQ</span>(cl, <span class="fu">library</span>(dplyr))</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Perform stratified bootstrap</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  boot_parallel <span class="ot">&lt;-</span> <span class="fu">parLapply</span>(cl, <span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span>, <span class="cf">function</span>(i) {</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    fielding <span class="sc">%&gt;%</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_by</span>(teamID) <span class="sc">%&gt;%</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sample_n</span>(<span class="at">size =</span> <span class="fu">n</span>(), <span class="at">replace =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>      <span class="fu">summarise</span>(<span class="at">avg_RF =</span> <span class="fu">mean</span>(RF, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stopCluster</span>(cl)</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Combine results</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>  boot_parallel <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(boot_parallel, <span class="at">.id =</span> <span class="st">&quot;replicate&quot;</span>)</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Computing estimated RF and SE for teams with 10 highest RF</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>top_10_teams2 <span class="ot">&lt;-</span> boot_parallel <span class="sc">%&gt;%</span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">group_by</span>(teamID) <span class="sc">%&gt;%</span> <span class="co"># Group by teamID</span></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">summarise</span>(</span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>                    <span class="at">mean_RF =</span> <span class="fu">mean</span>(avg_RF, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="co"># Calculate mean RF</span></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>                    <span class="at">std_error =</span> <span class="fu">sd</span>(avg_RF, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="co"># Calculate SE</span></span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>                  ) <span class="sc">%&gt;%</span></span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">arrange</span>(<span class="fu">desc</span>(mean_RF)) <span class="sc">%&gt;%</span> <span class="co"># Sort by mean RF desc</span></span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>) </span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(top_10_teams2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 10 × 3
    teamID mean_RF std_error
    &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt;
- 1 RC1      0.576    0.0822
- 2 ELI      0.531    0.0652
- 3 LS1      0.531    0.0552
- 4 KEO      0.517    0.109 
- 5 RIC      0.511    0.0679
- 6 MLU      0.505    0.126 
- 7 BLA      0.494    0.0308
- 8 LS3      0.489    0.0155
- 9 TRN      0.482    0.0301
-10 PHU      0.479    0.0452</code></pre>
+ 1 RC1      0.572    0.0813
+ 2 LS1      0.532    0.0557
+ 3 ELI      0.528    0.0645
+ 4 MLU      0.517    0.125 
+ 5 KEO      0.512    0.115 
+ 6 RIC      0.508    0.0685
+ 7 BLA      0.494    0.0331
+ 8 LS3      0.489    0.0167
+ 9 TRN      0.480    0.0304
+10 PHU      0.479    0.0476</code></pre>
 </div>
 </div>
 <p>Using futures with the future package</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(future)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(furrr)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plan</span>(multisession, <span class="at">workers =</span> <span class="fu">detectCores</span>() <span class="sc">-</span> <span class="dv">1</span>)</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>boot_futures <span class="ot">&lt;-</span> <span class="fu">future_map_dfr</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span>, <span class="sc">~</span> {</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  fielding <span class="sc">%&gt;%</span></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(teamID) <span class="sc">%&gt;%</span></span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sample_n</span>(<span class="at">size =</span> <span class="fu">n</span>(), <span class="at">replace =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">avg_RF =</span> <span class="fu">mean</span>(RF, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>}, <span class="at">future.seed =</span> <span class="cn">TRUE</span>)  <span class="co"># Add this argument</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: UNRELIABLE VALUE: Future (&#39;&lt;none&gt;&#39;) unexpectedly generated random
-numbers without specifying argument &#39;seed&#39;. There is a risk that those random
-numbers are not statistically sound and the overall results might be invalid.
-To fix this, specify &#39;seed=TRUE&#39;. This ensures that proper, parallel-safe
-random numbers are produced via the L&#39;Ecuyer-CMRG method. To disable this
-check, use &#39;seed=NULL&#39;, or set option &#39;future.rng.onMisuse&#39; to &quot;ignore&quot;.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: UNRELIABLE VALUE: Future (&#39;&lt;none&gt;&#39;) unexpectedly generated random
-numbers without specifying argument &#39;seed&#39;. There is a risk that those random
-numbers are not statistically sound and the overall results might be invalid.
-To fix this, specify &#39;seed=TRUE&#39;. This ensures that proper, parallel-safe
-random numbers are produced via the L&#39;Ecuyer-CMRG method. To disable this
-check, use &#39;seed=NULL&#39;, or set option &#39;future.rng.onMisuse&#39; to &quot;ignore&quot;.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: UNRELIABLE VALUE: Future (&#39;&lt;none&gt;&#39;) unexpectedly generated random
-numbers without specifying argument &#39;seed&#39;. There is a risk that those random
-numbers are not statistically sound and the overall results might be invalid.
-To fix this, specify &#39;seed=TRUE&#39;. This ensures that proper, parallel-safe
-random numbers are produced via the L&#39;Ecuyer-CMRG method. To disable this
-check, use &#39;seed=NULL&#39;, or set option &#39;future.rng.onMisuse&#39; to &quot;ignore&quot;.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: UNRELIABLE VALUE: Future (&#39;&lt;none&gt;&#39;) unexpectedly generated random
-numbers without specifying argument &#39;seed&#39;. There is a risk that those random
-numbers are not statistically sound and the overall results might be invalid.
-To fix this, specify &#39;seed=TRUE&#39;. This ensures that proper, parallel-safe
-random numbers are produced via the L&#39;Ecuyer-CMRG method. To disable this
-check, use &#39;seed=NULL&#39;, or set option &#39;future.rng.onMisuse&#39; to &quot;ignore&quot;.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: UNRELIABLE VALUE: Future (&#39;&lt;none&gt;&#39;) unexpectedly generated random
-numbers without specifying argument &#39;seed&#39;. There is a risk that those random
-numbers are not statistically sound and the overall results might be invalid.
-To fix this, specify &#39;seed=TRUE&#39;. This ensures that proper, parallel-safe
-random numbers are produced via the L&#39;Ecuyer-CMRG method. To disable this
-check, use &#39;seed=NULL&#39;, or set option &#39;future.rng.onMisuse&#39; to &quot;ignore&quot;.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: UNRELIABLE VALUE: Future (&#39;&lt;none&gt;&#39;) unexpectedly generated random
-numbers without specifying argument &#39;seed&#39;. There is a risk that those random
-numbers are not statistically sound and the overall results might be invalid.
-To fix this, specify &#39;seed=TRUE&#39;. This ensures that proper, parallel-safe
-random numbers are produced via the L&#39;Ecuyer-CMRG method. To disable this
-check, use &#39;seed=NULL&#39;, or set option &#39;future.rng.onMisuse&#39; to &quot;ignore&quot;.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: UNRELIABLE VALUE: Future (&#39;&lt;none&gt;&#39;) unexpectedly generated random
-numbers without specifying argument &#39;seed&#39;. There is a risk that those random
-numbers are not statistically sound and the overall results might be invalid.
-To fix this, specify &#39;seed=TRUE&#39;. This ensures that proper, parallel-safe
-random numbers are produced via the L&#39;Ecuyer-CMRG method. To disable this
-check, use &#39;seed=NULL&#39;, or set option &#39;future.rng.onMisuse&#39; to &quot;ignore&quot;.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: UNRELIABLE VALUE: Future (&#39;&lt;none&gt;&#39;) unexpectedly generated random
-numbers without specifying argument &#39;seed&#39;. There is a risk that those random
-numbers are not statistically sound and the overall results might be invalid.
-To fix this, specify &#39;seed=TRUE&#39;. This ensures that proper, parallel-safe
-random numbers are produced via the L&#39;Ecuyer-CMRG method. To disable this
-check, use &#39;seed=NULL&#39;, or set option &#39;future.rng.onMisuse&#39; to &quot;ignore&quot;.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: UNRELIABLE VALUE: Future (&#39;&lt;none&gt;&#39;) unexpectedly generated random
-numbers without specifying argument &#39;seed&#39;. There is a risk that those random
-numbers are not statistically sound and the overall results might be invalid.
-To fix this, specify &#39;seed=TRUE&#39;. This ensures that proper, parallel-safe
-random numbers are produced via the L&#39;Ecuyer-CMRG method. To disable this
-check, use &#39;seed=NULL&#39;, or set option &#39;future.rng.onMisuse&#39; to &quot;ignore&quot;.</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>boot_futures</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(future)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(furrr)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plan</span>(multisession, <span class="at">workers =</span> <span class="fu">detectCores</span>() <span class="sc">-</span> <span class="dv">1</span>)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Using future package</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="fu">suppressWarnings</span>({</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Code block where warnings are suppressed</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  time_futures <span class="ot">&lt;-</span> <span class="fu">system.time</span>({</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    boot_futures <span class="ot">&lt;-</span> <span class="fu">future_map_dfr</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span>, <span class="sc">~</span> {</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>      fielding <span class="sc">%&gt;%</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>        <span class="fu">group_by</span>(teamID) <span class="sc">%&gt;%</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sample_n</span>(<span class="at">size =</span> <span class="fu">n</span>(), <span class="at">replace =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>        <span class="fu">summarise</span>(<span class="at">avg_RF =</span> <span class="fu">mean</span>(RF, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    }, <span class="at">future.seed =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Computing estimated RF and SE for teams with 10 highest RF</span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>top_10_teams3 <span class="ot">&lt;-</span> boot_futures <span class="sc">%&gt;%</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">group_by</span>(teamID) <span class="sc">%&gt;%</span> <span class="co"># Group by teamID</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">summarise</span>(</span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>                    <span class="at">mean_RF =</span> <span class="fu">mean</span>(avg_RF, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="co"># Calculate mean RF</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>                    <span class="at">std_error =</span> <span class="fu">sd</span>(avg_RF, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="co"># Calculate SE</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>                  ) <span class="sc">%&gt;%</span></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">arrange</span>(<span class="fu">desc</span>(mean_RF)) <span class="sc">%&gt;%</span> <span class="co"># Sort by mean RF desc</span></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>) </span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(top_10_teams3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 140,000 × 2
-   teamID avg_RF
-   &lt;chr&gt;   &lt;dbl&gt;
- 1 ALT     0.389
- 2 ANA     0.405
- 3 ARI     0.364
- 4 ATL     0.392
- 5 BAL     0.384
- 6 BFN     0.459
- 7 BFP     0.391
- 8 BL1     0.437
- 9 BL2     0.414
-10 BL3     0.416
-# ℹ 139,990 more rows</code></pre>
+<pre><code># A tibble: 10 × 3
+   teamID mean_RF std_error
+   &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+ 1 RC1      0.574    0.0809
+ 2 LS1      0.533    0.0552
+ 3 ELI      0.527    0.0615
+ 4 MLU      0.517    0.134 
+ 5 KEO      0.514    0.106 
+ 6 RIC      0.508    0.0684
+ 7 BLA      0.496    0.0312
+ 8 LS3      0.489    0.0156
+ 9 TRN      0.481    0.0297
+10 PHU      0.479    0.0449</code></pre>
 </div>
 </div>
 <p>Part (B) - Generate a table showing the estimated RF and associated standard errors from the three approaches.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>summarize_bootstrap <span class="ot">&lt;-</span> <span class="cf">function</span>(bootstrap_data) {</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  bootstrap_data <span class="sc">%&gt;%</span></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(teamID) <span class="sc">%&gt;%</span></span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean_RF =</span> <span class="fu">mean</span>(avg_RF, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">std_error =</span> <span class="fu">sd</span>(avg_RF, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="fu">desc</span>(mean_RF)) <span class="sc">%&gt;%</span></span>
-<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)  <span class="co"># Select top 10 teams</span></span>
-<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>results_no_parallel <span class="ot">&lt;-</span> <span class="fu">summarize_bootstrap</span>(boot_no_parallel)</span>
-<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>results_parallel <span class="ot">&lt;-</span> <span class="fu">summarize_bootstrap</span>(boot_parallel)</span>
-<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>results_futures <span class="ot">&lt;-</span> <span class="fu">summarize_bootstrap</span>(boot_futures)</span>
-<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate formatted tables for each result</span></span>
-<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(results_no_parallel, <span class="at">caption =</span> <span class="st">&quot;Results without Parallel Processing&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Add a column to each dataset to identify the method</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>top_10_teams1 <span class="ot">&lt;-</span> top_10_teams1 <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Method =</span> <span class="st">&quot;No Parallel&quot;</span>)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>top_10_teams2 <span class="ot">&lt;-</span> top_10_teams2 <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Method =</span> <span class="st">&quot;Parallel&quot;</span>)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>top_10_teams3 <span class="ot">&lt;-</span> top_10_teams3 <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Method =</span> <span class="st">&quot;Futures&quot;</span>)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine all results into one table (30 rows)</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>combined_results <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(top_10_teams1, top_10_teams2, top_10_teams3)</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the combined table</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(combined_results, <span class="at">caption =</span> <span class="st">&quot;Estimated RF and Standard Errors from Three Approaches&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
-<caption>Results without Parallel Processing</caption>
+<caption>Estimated RF and Standard Errors from Three Approaches</caption>
 <thead>
 <tr class="header">
 <th style="text-align: left;">teamID</th>
 <th style="text-align: right;">mean_RF</th>
 <th style="text-align: right;">std_error</th>
+<th style="text-align: left;">Method</th>
 </tr>
 </thead>
 <tbody>
@@ -3431,187 +3338,202 @@ check, use &#39;seed=NULL&#39;, or set option &#39;future.rng.onMisuse&#39; to &
 <td style="text-align: left;">RC1</td>
 <td style="text-align: right;">0.5710291</td>
 <td style="text-align: right;">0.0795937</td>
+<td style="text-align: left;">No Parallel</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">LS1</td>
 <td style="text-align: right;">0.5333202</td>
 <td style="text-align: right;">0.0575057</td>
+<td style="text-align: left;">No Parallel</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">ELI</td>
 <td style="text-align: right;">0.5251487</td>
 <td style="text-align: right;">0.0635801</td>
+<td style="text-align: left;">No Parallel</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">MLU</td>
 <td style="text-align: right;">0.5155406</td>
 <td style="text-align: right;">0.1278510</td>
+<td style="text-align: left;">No Parallel</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">KEO</td>
 <td style="text-align: right;">0.5115138</td>
 <td style="text-align: right;">0.1085589</td>
+<td style="text-align: left;">No Parallel</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">RIC</td>
 <td style="text-align: right;">0.5081668</td>
 <td style="text-align: right;">0.0677652</td>
+<td style="text-align: left;">No Parallel</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">BLA</td>
 <td style="text-align: right;">0.4947030</td>
 <td style="text-align: right;">0.0317696</td>
+<td style="text-align: left;">No Parallel</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">LS3</td>
 <td style="text-align: right;">0.4888690</td>
 <td style="text-align: right;">0.0152497</td>
+<td style="text-align: left;">No Parallel</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">TRN</td>
 <td style="text-align: right;">0.4812814</td>
 <td style="text-align: right;">0.0297023</td>
+<td style="text-align: left;">No Parallel</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">PHU</td>
 <td style="text-align: right;">0.4780835</td>
 <td style="text-align: right;">0.0465350</td>
+<td style="text-align: left;">No Parallel</td>
 </tr>
-</tbody>
-</table>
-</div>
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(results_parallel, <span class="at">caption =</span> <span class="st">&quot;Results with Parallel Processing&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<caption>Results with Parallel Processing</caption>
-<thead>
-<tr class="header">
-<th style="text-align: left;">teamID</th>
-<th style="text-align: right;">mean_RF</th>
-<th style="text-align: right;">std_error</th>
-</tr>
-</thead>
-<tbody>
 <tr class="odd">
 <td style="text-align: left;">RC1</td>
-<td style="text-align: right;">0.5761932</td>
-<td style="text-align: right;">0.0822459</td>
+<td style="text-align: right;">0.5723527</td>
+<td style="text-align: right;">0.0812723</td>
+<td style="text-align: left;">Parallel</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">ELI</td>
-<td style="text-align: right;">0.5311139</td>
-<td style="text-align: right;">0.0652140</td>
-</tr>
-<tr class="odd">
 <td style="text-align: left;">LS1</td>
-<td style="text-align: right;">0.5310986</td>
-<td style="text-align: right;">0.0551900</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">KEO</td>
-<td style="text-align: right;">0.5172834</td>
-<td style="text-align: right;">0.1089136</td>
+<td style="text-align: right;">0.5322786</td>
+<td style="text-align: right;">0.0557447</td>
+<td style="text-align: left;">Parallel</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">RIC</td>
-<td style="text-align: right;">0.5108764</td>
-<td style="text-align: right;">0.0679229</td>
+<td style="text-align: left;">ELI</td>
+<td style="text-align: right;">0.5282857</td>
+<td style="text-align: right;">0.0644688</td>
+<td style="text-align: left;">Parallel</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">MLU</td>
-<td style="text-align: right;">0.5046427</td>
-<td style="text-align: right;">0.1259773</td>
+<td style="text-align: right;">0.5166897</td>
+<td style="text-align: right;">0.1246475</td>
+<td style="text-align: left;">Parallel</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">BLA</td>
-<td style="text-align: right;">0.4943768</td>
-<td style="text-align: right;">0.0308161</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">LS3</td>
-<td style="text-align: right;">0.4887597</td>
-<td style="text-align: right;">0.0155177</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">TRN</td>
-<td style="text-align: right;">0.4815118</td>
-<td style="text-align: right;">0.0300984</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">PHU</td>
-<td style="text-align: right;">0.4791683</td>
-<td style="text-align: right;">0.0451727</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(results_futures, <span class="at">caption =</span> <span class="st">&quot;Results with Futures&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<caption>Results with Futures</caption>
-<thead>
-<tr class="header">
-<th style="text-align: left;">teamID</th>
-<th style="text-align: right;">mean_RF</th>
-<th style="text-align: right;">std_error</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">RC1</td>
-<td style="text-align: right;">0.5747532</td>
-<td style="text-align: right;">0.0847976</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">ELI</td>
-<td style="text-align: right;">0.5293785</td>
-<td style="text-align: right;">0.0638663</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">LS1</td>
-<td style="text-align: right;">0.5275033</td>
-<td style="text-align: right;">0.0543259</td>
+<td style="text-align: left;">KEO</td>
+<td style="text-align: right;">0.5120781</td>
+<td style="text-align: right;">0.1145735</td>
+<td style="text-align: left;">Parallel</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">RIC</td>
-<td style="text-align: right;">0.5109342</td>
-<td style="text-align: right;">0.0690702</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">MLU</td>
-<td style="text-align: right;">0.5108576</td>
-<td style="text-align: right;">0.1308417</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">KEO</td>
-<td style="text-align: right;">0.5097307</td>
-<td style="text-align: right;">0.1103986</td>
+<td style="text-align: right;">0.5078732</td>
+<td style="text-align: right;">0.0684938</td>
+<td style="text-align: left;">Parallel</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">BLA</td>
-<td style="text-align: right;">0.4946407</td>
-<td style="text-align: right;">0.0318082</td>
+<td style="text-align: right;">0.4942444</td>
+<td style="text-align: right;">0.0331061</td>
+<td style="text-align: left;">Parallel</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">LS3</td>
-<td style="text-align: right;">0.4899528</td>
-<td style="text-align: right;">0.0155545</td>
+<td style="text-align: right;">0.4892985</td>
+<td style="text-align: right;">0.0167273</td>
+<td style="text-align: left;">Parallel</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">PHU</td>
-<td style="text-align: right;">0.4814524</td>
-<td style="text-align: right;">0.0467332</td>
+<td style="text-align: left;">TRN</td>
+<td style="text-align: right;">0.4804906</td>
+<td style="text-align: right;">0.0304364</td>
+<td style="text-align: left;">Parallel</td>
 </tr>
 <tr class="even">
+<td style="text-align: left;">PHU</td>
+<td style="text-align: right;">0.4794440</td>
+<td style="text-align: right;">0.0476044</td>
+<td style="text-align: left;">Parallel</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">RC1</td>
+<td style="text-align: right;">0.5743962</td>
+<td style="text-align: right;">0.0808876</td>
+<td style="text-align: left;">Futures</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LS1</td>
+<td style="text-align: right;">0.5325716</td>
+<td style="text-align: right;">0.0551777</td>
+<td style="text-align: left;">Futures</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ELI</td>
+<td style="text-align: right;">0.5274854</td>
+<td style="text-align: right;">0.0615475</td>
+<td style="text-align: left;">Futures</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MLU</td>
+<td style="text-align: right;">0.5166540</td>
+<td style="text-align: right;">0.1342058</td>
+<td style="text-align: left;">Futures</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">KEO</td>
+<td style="text-align: right;">0.5137208</td>
+<td style="text-align: right;">0.1064974</td>
+<td style="text-align: left;">Futures</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RIC</td>
+<td style="text-align: right;">0.5080155</td>
+<td style="text-align: right;">0.0683617</td>
+<td style="text-align: left;">Futures</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BLA</td>
+<td style="text-align: right;">0.4960448</td>
+<td style="text-align: right;">0.0311620</td>
+<td style="text-align: left;">Futures</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LS3</td>
+<td style="text-align: right;">0.4890953</td>
+<td style="text-align: right;">0.0156352</td>
+<td style="text-align: left;">Futures</td>
+</tr>
+<tr class="odd">
 <td style="text-align: left;">TRN</td>
-<td style="text-align: right;">0.4812355</td>
-<td style="text-align: right;">0.0290451</td>
+<td style="text-align: right;">0.4805866</td>
+<td style="text-align: right;">0.0297271</td>
+<td style="text-align: left;">Futures</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">PHU</td>
+<td style="text-align: right;">0.4794972</td>
+<td style="text-align: right;">0.0449477</td>
+<td style="text-align: left;">Futures</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 <p>Part (C) - Report and discuss the performance difference between the versions.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine execution times into a table</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>time_table <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Method =</span> <span class="fu">c</span>(<span class="st">&quot;No Parallel&quot;</span>, <span class="st">&quot;Parallel&quot;</span>, <span class="st">&quot;Futures&quot;</span>),</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Execution_Time =</span> <span class="fu">c</span>(time_no_parallel[<span class="dv">3</span>], time_parallel[<span class="dv">3</span>], time_futures[<span class="dv">3</span>])</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(time_table)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       Method Execution_Time
+1 No Parallel         22.328
+2    Parallel          4.768
+3     Futures          5.235</code></pre>
+</div>
+</div>
+<p>The performance comparison shows that parallel processing significantly improves execution speed. The No Parallel method took the longest at 22.52 seconds, while the Parallel and Futures methods reduced execution time to 4.913 seconds and 5.342 seconds, respectively. Parallel offers the best performance, but Futures provides a more user-friendly interface with comparable efficiency. Both Parallel and Futures are far more suitable than No Parallel for computationally intensive tasks like bootstrapping.</p>
 
 </main>
 <!-- /main column -->
