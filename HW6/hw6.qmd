@@ -149,18 +149,28 @@ print(top_10_teams3)
 Part (B) - Generate a table showing the estimated RF and associated standard errors from the three approaches.
 ```{r}
 library(dplyr)
-library(knitr)
 
-# Add a column to each dataset to identify the method
-top_10_teams1 <- top_10_teams1 %>% mutate(Method = "No Parallel")
-top_10_teams2 <- top_10_teams2 %>% mutate(Method = "Parallel")
-top_10_teams3 <- top_10_teams3 %>% mutate(Method = "Futures")
+# Remove duplicate `teamID` columns and bind by columns
+combined_teams <- cbind(
+  top_10_teams1 %>% select(-teamID),  # Remove the duplicate `teamID`
+  top_10_teams2 %>% select(-teamID),  # Remove the duplicate `teamID`
+  top_10_teams3
+)
 
-# Combine all results into one table (30 rows)
-combined_results <- bind_rows(top_10_teams1, top_10_teams2, top_10_teams3)
+# Rename columns for clarity
+colnames(combined_teams) <- c(
+  "mean_RF_no_parallel", "std_error_no_parallel",  # From `top_10_teams1`
+  "mean_RF_parallel", "std_error_parallel",  # From `top_10_teams2`
+  "teamID", "mean_RF_futures", "std_error_futures"  # From `top_10_teams3`
+)
 
-# Print the combined table
-kable(combined_results, caption = "Estimated RF and Standard Errors from Three Approaches")
+# Reorganize so that `teamID` is the first column
+combined_teams <- combined_teams %>%
+  relocate(teamID, .before = mean_RF_no_parallel)
+
+# View the combined result
+print(combined_teams)
+
 ```
 
 
@@ -174,4 +184,4 @@ time_table <- data.frame(
 )
 print(time_table)
 ```
-The performance comparison shows that parallel processing significantly improves execution speed. The No Parallel method took the longest at 22.52 seconds, while the Parallel and Futures methods reduced execution time to 4.913 seconds and 5.342 seconds, respectively. Parallel offers the best performance, but Futures provides a more user-friendly interface with comparable efficiency. Both Parallel and Futures are far more suitable than No Parallel for computationally intensive tasks like bootstrapping.
+The performance comparison shows that parallel processing significantly improves execution speed. The No Parallel method took the longest, while the Parallel and Futures methods reduced execution time substantially. Parallel offers the best performance, but Futures has a comparable efficiency as well. Both Parallel and Futures are far more suitable than No Parallel for computationally intensive tasks like bootstrapping.
